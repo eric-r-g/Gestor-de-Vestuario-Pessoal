@@ -1,25 +1,33 @@
 package itens;
 
+import java.util.UUID;
 // item genérico do vestuario
 public abstract class Item {
+	private final UUID id;
 	private String modelo;
 	private String lojaOrigem;
 	private double preco;
+	private int numeroDeUsos;
 	
 	public enum estadosConservacao{
-		NOVO, USADO, DANIFICADO;
+		Novo, Usado, Danificados;
 	}
-	
 	private estadosConservacao conservacao;
 	
 	public Item(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco) {
+		this.id = UUID.randomUUID();
 		setModelo(modelo);
 		setLojaOrigem(lojaOrigem);
 		setConservacao(conservacao);
 		setPreco(preco);
+		setNumeroDeUsos(0);
 	}
 	
 	// getters
+	public UUID getId() {
+		return id;
+	}
+	
 	public double getPreco() {
 		return preco;
 	}
@@ -36,7 +44,15 @@ public abstract class Item {
 		return conservacao;
 	}
 	
+	public int getNumeroDeUsos() {
+		return numeroDeUsos;
+	}
+	
 	// setters
+	public void setNumeroDeUsos(int numeroDeUsos) {
+		this.numeroDeUsos = numeroDeUsos;
+	}
+	
 	public void setPreco(double preco) {
 		this.preco = preco;
 	}
