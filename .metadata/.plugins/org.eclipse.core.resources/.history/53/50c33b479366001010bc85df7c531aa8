@@ -1,0 +1,11 @@
+package recursosGrafico;
+
+import interfaceGrafica.GerenciadorPaginas;
+
+public abstract class ModeloJanelaListar extends ModeloPagina {
+	private static final long serialVersionUID = 1L;
+
+	public ModeloJanelaListar(GerenciadorPaginas gerenciador) {
+		super(gerenciador);
+	}
+}

@@ -1,0 +1,49 @@
+package itens;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import erros.EmprestimoException;
+
+public class Acessorio extends Item implements IEmprestavel {
+	private LocalDate dataDeEmprestimo;
+	private String nomeEmprestimo;
+	private String material;
+	
+	public Acessorio(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, String material) {
+		super(modelo, lojaOrigem, conservacao, preco);
+		this.material = material;
+	}
+	
+	// metodos para emprestimo
+		public void registrarEmprestimo(LocalDate data, String nome) throws EmprestimoException {
+			if (dataDeEmprestimo != null) {
+				throw new EmprestimoException("Já está em emprestimo");
+			}
+			dataDeEmprestimo = data;
+			nomeEmprestimo = nome;
+		}
+		
+		public long quantidadeDeDiasDesdeOEmprestimo() throws EmprestimoException{
+			if (dataDeEmprestimo == null) {
+				throw new EmprestimoException("não está em emprestimo");
+			}
+			return ChronoUnit.DAYS.between(LocalDate.now(), dataDeEmprestimo);
+			
+		}
+		
+		public void registrarDevolucao() throws EmprestimoException {
+			if (dataDeEmprestimo == null) {
+				throw new EmprestimoException("não está em emprestimo");
+			}
+			dataDeEmprestimo = null;
+		}	
+	// getters
+	public String getTipo() { return "acessorio"; }
+	public String getMaterial() { return material; }
+	public String getNomeEmprestimo() { return nomeEmprestimo; }
+	public LocalDate dataDeEmprestimo() { return dataDeEmprestimo; }
+
+	// setters
+	public void setMaterial(String material) { this.material = material; }
+}

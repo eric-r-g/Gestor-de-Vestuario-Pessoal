@@ -1,0 +1,7 @@
+package itens;
+
+public class PecaSuperior extends Item implements IEmprestavel {
+	public PecaSuperior(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco) {
+		super(modelo, lojaOrigem, conservacao, preco);
+	}
+}

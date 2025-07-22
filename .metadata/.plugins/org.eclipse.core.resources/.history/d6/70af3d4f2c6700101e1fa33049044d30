@@ -1,0 +1,126 @@
+package interfaceGrafica;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import erros.ArrayVaziaException;
+import interfaceGrafica.JanelaLookAdd.ComboItem;
+import itens.ILavavel;
+import itens.Item;
+import managers.BDManager;
+import managers.ItemManager;
+import managers.LavagemManager;
+import recursosGrafico.ModeloJanelaListar;
+
+public class JanelaLavagemListar extends ModeloJanelaListar <ILavavel>{
+	private static final long serialVersionUID = 1L;
+	protected LavagemManager lavagemManager;
+	private ItemManager itemManager;
+	private JComboBox <ComboItem> dropdownItem;
+	private JButton botaoSubmeter;
+	protected BDManager bdManager;
+	
+	public JanelaLavagemListar(GerenciadorPaginas gerenciador, LavagemManager lavagemManager, ItemManager itemManager, BDManager bdManager) {
+		super(gerenciador, "Listagem Lavagens", null);
+		this.lavagemManager = lavagemManager;
+		this.bdManager = bdManager;
+		this.itemManager = itemManager;
+		
+		atualizarListagem();
+		configuracoesExtrasContentPanel();
+	}
+	
+	protected void configuracoesExtrasContentPanel() {
+		dropdownItem = new JComboBox<>();
+		dropdownItem.setMaximumSize(new Dimension(300, 30));
+		dropdownItem.addItem(new ComboItem("Insira aqui um novo item: ", null));
+		try {
+			ArrayList <Item> itens = itemManager.listarLavaveis();
+			for(Item item : itens) {
+				dropdownItem.addItem(new ComboItem(item.getTipo() + ": " + item.getModelo(), item.getId()));
+			}
+		} catch (Exception e) {
+			System.out.print(e);
+		}
+		painelSuperior.add(dropdownItem, BorderLayout.CENTER);
+		
+		botaoSubmeter = new JButton("Adicionar");
+		botaoSubmeter.setMaximumSize(new Dimension(150, 30));
+		
+		botaoSubmeter.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			UUID id = ((ComboItem) dropdownItem.getSelectedItem()).getId();
+        			ILavavel item = (ILavavel) itemManager.retornarItemPorId(id);
+        			lavagemManager.adicionar(item);
+        		} catch(Exception erro) {
+        			System.out.print(erro);
+        		}
+        		
+        		atualizarListagem();
+        		revalidate();
+        		repaint();
+        	}
+        });
+		
+		painelSuperior.add(botaoSubmeter, BorderLayout.EAST);
+		
+		JButton botaoLavar = new JButton("Realizar lavagem");
+		botaoLavar.setMaximumSize(new Dimension(150, 30));
+		
+		botaoLavar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			LocalDate data = LocalDate.now();
+        			lavagemManager.realizarLavagem(data.getYear(), data.getMonth(), data.getDayOfMonth());
+        		} catch(Exception erro) {
+        			System.out.print(erro);
+        		}
+        	}
+        });
+		
+		contentPane.add(botaoLavar);
+	}
+
+	protected ArrayList<ILavavel> obterListagem() throws ArrayVaziaException {
+		return lavagemManager.listarTodos();
+	}
+	
+	protected JPanel obterPainelItem(ILavavel item) {
+		JPanel itemPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		itemPanel.add(new JLabel(item.getModelo() + " - numero de lavagens: " + item.getQuantidadeLavagens()));
+		itemPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        itemPanel.setMaximumSize(new Dimension(800, 40));
+		
+        JButton butaoDelete = new JButton("Deletar");
+        butaoDelete.putClientProperty("id", item.getId());
+        
+        butaoDelete.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		UUID id = (UUID) butaoDelete.getClientProperty("id");
+        		try {
+        			ILavavel removido = lavagemManager.retornarLavagemPorId(id);
+        			lavagemManager.remover(removido);
+        		} catch (Exception erro) {
+        			System.out.print(erro);
+        		}
+        		atualizarListagem();
+            }
+        });
+		
+		return itemPanel;
+	}
+
+}

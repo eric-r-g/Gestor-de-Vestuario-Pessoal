@@ -1,0 +1,56 @@
+package interfaceGrafica;
+import managers.*;
+
+
+import javax.swing.*;
+import java.awt.*;
+
+
+public class GerenciadorPaginas {
+	protected BDManager bdManager;
+	protected ItemManager itemManager;
+	protected JFrame framePrincipal;
+	protected CardLayout layout;
+	protected JPanel cardPanel;
+	protected JanelaItensListar JIListar;
+
+	public GerenciadorPaginas(){
+			itemManager = new ItemManager();
+			bdManager = new BDManager(;)
+            criarJanela();
+	}
+	
+	public void criarJanela() {
+		framePrincipal = new JFrame("navegacao");
+		framePrincipal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		framePrincipal.setSize(new Dimension(1200, 900));
+		
+		layout = new CardLayout();
+		cardPanel = new JPanel(layout);
+		
+		framePrincipal.add(cardPanel);
+		
+		JIListar = new JanelaItensListar(this, itemManager);
+		cardPanel.add(JIListar, "TELA_ITENS_LISTAR");
+		
+		JanelaItensAdd JIAdd = new JanelaItensAdd(this, itemManager);
+		cardPanel.add(JIAdd, "TELA_ITENS_ADICIONAR");
+		
+		JanelaLookListar JLListar = new JanelaLookListar(this);
+		cardPanel.add(JLListar, "TELA_LOOKS_LISTAR");
+		
+		framePrincipal.setLocationRelativeTo(null);
+		framePrincipal.setVisible(true);
+		
+		
+		mostrarTela("TELA_ITENS_LISTAR");
+	}
+	
+	public void mostrarTela(String nomeTela) {
+        layout.show(cardPanel, nomeTela);
+        if (nomeTela.equals("TELA_ITENS_LISTAR")) {
+        	JIListar.atualizarListagem();
+        }
+    }
+	
+}

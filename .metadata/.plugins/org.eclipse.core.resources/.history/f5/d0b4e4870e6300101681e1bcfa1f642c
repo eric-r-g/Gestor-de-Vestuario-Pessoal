@@ -1,0 +1,64 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+
+public abstract class ModeloPagina extends JFrame {
+	private static final long serialVersionUID = 1L;
+	private Font fonteLogo = new Font("Arial", Font.BOLD, 64); 
+	private JPanel mainPane;
+	private JPanel sidePane;
+	protected JPanel contentPane;
+	
+	public ModeloPagina(String titulo) {
+		super(titulo);
+		// painel principal
+		mainPane = new JPanel(new BorderLayout());
+		sidePane = new JPanel(new GridBagLayout());
+		contentPane = new JPanel();
+		
+		sidePane.setBackground(Color.BLACK);
+		sidePane.setPreferredSize(new Dimension(300, 0));
+		
+		contentPane.setBackground(Color.WHITE);
+		
+		mainPane.add(sidePane, BorderLayout.WEST); // Lateral esquerda
+        mainPane.add(contentPane, BorderLayout.CENTER); // Centro (resto do espaço)		
+		
+
+        JLabel logo = new JLabel("GVP");
+        logo.setForeground(Color.WHITE);
+        logo.setBorder(BorderFactory.createEmptyBorder(50, 20, 50, 20)); 
+        logo.setFont(fonteLogo);
+        
+        
+        BulletPanel dados = new BulletPanel("dados pessoais");
+        BulletPanel itens = new BulletPanel("itens");
+        BulletPanel looks = new BulletPanel("looks");
+        BulletPanel lavagens = new BulletPanel("lavagens");
+        BulletPanel estatisticas = new BulletPanel("estatisticas");
+        
+        JPanel bullets = new JPanel();
+        bullets.setBackground(Color.BLACK);
+        bullets.add(dados);
+        bullets.add(itens);
+        bullets.add(looks);
+        bullets.add(lavagens);
+        bullets.add(estatisticas);
+        
+        sidePane.add(logo, BorderLayout.NORTH);
+        sidePane.add(bullets, BorderLayout.CENTER);
+        
+        setContentPane(mainPane);
+		
+        setSize(800, 600);
+        setResizable(false);         		// não pode ter seu tamanho alterado
+        setLocationRelativeTo(null);         // aparece no meio da tela
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);      // fecha quando sai
+		setUndecorated(true);     // serve pra não aparecer barra
+		
+		configurarContentPane();
+	}
+	
+	protected abstract void configurarContentPane();
+}

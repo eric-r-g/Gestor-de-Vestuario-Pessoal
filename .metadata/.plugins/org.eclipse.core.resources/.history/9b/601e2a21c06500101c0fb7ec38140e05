@@ -1,0 +1,15 @@
+package repositorios;
+
+import itens.Item;
+
+
+public class RepositorioItem extends RepositorioBase <Item>{
+	
+	public RepositorioItem() {
+		super();
+	}
+	
+	public RepositorioItem(int tamMax) {
+		super(tamMax);
+	}
+}

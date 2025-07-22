@@ -1,0 +1,15 @@
+package repositorios;
+
+import itens.IEmprestavel;
+
+
+public class RepositorioEmprestimo extends RepositorioBase <IEmprestavel> {
+	
+	public RepositorioEmprestimo() {
+		super();
+	}
+	
+	public RepositorioEmprestimo(int tamMax) {
+		super(tamMax);
+	}
+}

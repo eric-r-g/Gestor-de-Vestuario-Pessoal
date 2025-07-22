@@ -1,0 +1,78 @@
+package repositorios;
+
+import java.util.ArrayList;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import itens.ILavavel;
+
+
+public class RepositorioLavagem {
+	private ArrayList <ILavavel> lavagens;
+	private final int tamanhoMax;
+	
+	public RepositorioLavagem() {
+		tamanhoMax = 100;
+		lavagens = new ArrayList <ILavavel>();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		tamanhoMax = tamMax;
+		lavagens = new ArrayList <ILavavel>();
+	}
+	
+	// getters
+	public int getTamanho() { return lavagens.size(); }
+	public ArrayList<ILavavel> getLavagem() throws ArrayVaziaException {
+		if(lavagens.size() == 0) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		return lavagens; 
+	}
+
+	public void inserirLavagem(ILavavel novo) throws ArrayCheiaException, ElementoExistenteException {
+		if (lavagens.size() == tamanhoMax) {
+			throw new ArrayCheiaException("Array está vazia");			
+		}
+		for(ILavavel item : lavagens) {
+			if(item.equals(novo)) {
+				throw new ElementoExistenteException("lavagem já existente");
+			}
+		}
+		lavagens.add(novo);
+	}
+	
+	public ILavavel retornarLavagem(ILavavel item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (lavagens.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		
+		for(int i = 0; i < lavagens.size(); ++i) {
+			if (lavagens.get(i).equals(item)) {
+				return lavagens.get(i);
+			}
+		}
+		throw new ElementoInexistenteException("lavagem inexistente");		
+	}
+	
+	// talvez trocar por UUID
+	public void removerLavagem(ILavavel item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (lavagens.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		boolean remocao = false;
+		
+		for(int i = 0; i < lavagens.size(); ++i) {
+			if (lavagens.get(i).equals(item)) {
+				lavagens.remove(i);
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			throw new ElementoInexistenteException("lavagem inexistente");		
+		}
+	}
+}

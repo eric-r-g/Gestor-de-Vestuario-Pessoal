@@ -1,0 +1,5 @@
+package itens;
+
+public interface ILavavel {
+	
+}

@@ -1,0 +1,80 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import itens.IEmprestavel;
+import managers.BDManager;
+import managers.EmprestimoManager;
+import recursosGrafico.ModeloJanelaListar;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+public class JanelaEmprestimoListar extends ModeloJanelaListar <IEmprestavel> {
+	private static final long serialVersionUID = 1L;
+	private EmprestimoManager emprestimoManager;
+	private BDManager bdManager;
+	private JPanel painelListagem;
+	
+	public JanelaEmprestimoListar(GerenciadorPaginas gerenciador, EmprestimoManager emprestimoManager, BDManager bdManager) {	
+		super(gerenciador, "Listagens Emprestimos", "TELA_EMPRESTIMOS_ADICIONAR");
+		this.emprestimoManager = emprestimoManager;
+		this.bdManager = bdManager;
+	}
+	
+	public void atualizarListagem() {
+		painelListagem.removeAll();
+		try {
+			ArrayList <IEmprestavel> lista = emprestimoManager.listarTodos();
+			
+			if (lista != null) {
+				for(IEmprestavel item : lista) { // mudanças quando tiver o repositorio
+		            JPanel emprestimoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		            emprestimoPanel.add(new JLabel(item.getTipo() + ": " + item.getModelo()));
+		            emprestimoPanel.add(new JLabel("Em posse:" + item.getNomeEmprestimo()));
+		            // ToDo: o resto
+		            
+		            emprestimoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+		            emprestimoPanel.setMaximumSize(new Dimension(800, 40));
+		            
+		            JButton butaoDelete = new JButton("Encerrar emprestimo");
+		            butaoDelete.putClientProperty("id", item.getId());
+		            
+		            butaoDelete.addMouseListener(new MouseAdapter() {
+		            	public void mouseClicked(MouseEvent e) {
+		            		UUID id = (UUID) butaoDelete.getClientProperty("id");
+		            		try {
+		            			IEmprestavel removido = emprestimoManager.retornarEmprestavelPorId(id);
+		            			emprestimoManager.terminarEmprestimo(removido);
+		            			bdManager.removerEmprestavel(removido);
+		            		} catch (Exception erro) {
+		            			System.out.print(erro);
+		            		}
+		            		atualizarListagem();	
+		                }
+		            });
+		            emprestimoPanel.add(butaoDelete);
+		            painelListagem.add(emprestimoPanel);
+		            painelListagem.add(Box.createVerticalStrut(5)); 
+		        }
+			}
+		} catch (Exception e) {
+			// ToDo: tratamento de erro
+		}
+		
+	}
+
+	@Override
+	protected ArrayList<IEmprestavel> obterListagem() {
+		return emprestimoManager.listarTodos();
+	}
+
+	@Override
+	protected JPanel obterPainelItem(IEmprestavel item) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

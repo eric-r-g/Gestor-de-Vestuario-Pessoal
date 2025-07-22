@@ -1,0 +1,153 @@
+package managers;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import itens.Acessorio;
+import itens.Calcado;
+import itens.Item;
+import itens.Look;
+import itens.PecaInferior;
+import itens.PecaSuperior;
+import itens.PecaUnica;
+import repositorios.RepositorioLooks;
+
+public class LookManager extends ManagerBase<Look>{
+	private BDManager bdManager;
+	private ItemManager itemManager;
+	
+	public LookManager(BDManager bdManager, ItemManager itemManager) {
+		super(new RepositorioLooks());
+		this.bdManager = bdManager;	
+		this.itemManager = itemManager;
+		inicializarDados();
+	}
+	
+    public void atualizarBD() {
+    	try {
+			ArrayList <Look> lista = listarTodos();
+			for(Look look : lista) {
+				try {
+					bdManager.inserirLook(look);
+				} catch (SQLException e) {
+					System.out.print(e);
+				}
+			}
+		} catch (ArrayVaziaException e) {
+			System.out.print(e);
+		} 
+    }
+    
+    public void inicializarDados() {
+    	try {
+    		ResultSet rs = bdManager.listarLooks();
+    		while(rs.next()) {
+    			try {
+	    			boolean modo1 = false;
+	    			Acessorio acessorio = null;
+	    			Calcado calcado = null;
+	    			PecaSuperior superior = null;
+	    			PecaInferior inferior = null;
+	    			PecaUnica unica = null;
+	    			
+
+	    			// talvez mudar a forma da logica
+	    			String idAcessorio = rs.getString("id_acessorio");
+	    			if(idAcessorio != null) {
+	    				acessorio = (Acessorio) itemManager.retornarItemPorId(UUID.fromString(idAcessorio));
+	    			}
+
+	    			
+	                String idCalcado = rs.getString("id_calcado");
+	                if(idCalcado != null) {
+	                	calcado = (Calcado) itemManager.retornarItemPorId(UUID.fromString(idCalcado));
+	                }
+	                
+	                String idSuperior = rs.getString("id_superior");
+	                if(idSuperior != null) {
+	                	superior = (PecaSuperior) itemManager.retornarItemPorId(UUID.fromString(idSuperior));
+	                	modo1 = true;
+	                }
+	                
+	
+	                String idInferior = rs.getString("id_inferior");
+	                if(idInferior != null) {
+	                	inferior = (PecaInferior) itemManager.retornarItemPorId(UUID.fromString(idInferior));
+	                	modo1 = true;
+	                }
+	
+
+	                String idUnica = rs.getString("id_unica");
+	                if(idUnica != null) {
+	                	unica = (PecaUnica) itemManager.retornarItemPorId(UUID.fromString(idUnica));
+	                }
+	                
+	                
+	                Look novo = null;
+	                if (modo1) {
+	                	novo = new Look(superior, inferior, calcado);
+                		if (idAcessorio != null) {
+                			novo.atualizarLook(acessorio);
+                		} 
+                	} else {
+                		novo = new Look(unica, calcado);
+                		if (idAcessorio != null) {
+                			novo.atualizarLook(acessorio);
+                		}
+                	}
+	                novo.setId(UUID.fromString(rs.getString("id")));
+	                
+
+	                adicionar(novo);
+    			} catch (Exception e) {
+    				System.out.print(e);
+    			}
+    		}
+    	} catch (SQLException e) {
+    		System.out.print(e);
+    	}
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaUnica unica) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(unica, calcado);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaSuperior superior, PecaInferior inferior) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(superior, inferior, calcado);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaUnica unica, Acessorio acessorio) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(unica, calcado);
+    	novo.atualizarLook(acessorio);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaSuperior superior, PecaInferior inferior, Acessorio acessorio) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(superior, inferior, calcado);
+    	novo.atualizarLook(acessorio);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void atualizarLook(Look look, ArrayList <Item> itens) throws ElementoInexistenteException, ArrayVaziaException, SQLException  {
+    	((RepositorioLooks) repositorio).atualizarElemento(look, itens);
+    	bdManager.atualizarLook(look);
+    }
+    
+    public void utilizarLook(Look look, String local, int ano, Month mes, int dia) throws ElementoInexistenteException, ArrayVaziaException {
+    	LocalDate data = LocalDate.of(ano, mes, dia);
+    	((RepositorioLooks) repositorio).utilizarLook(look, local, data);
+    }
+    
+    public Look RetornarItemPorId(UUID id) throws ArrayVaziaException, ElementoInexistenteException {
+		return ((RepositorioLooks) repositorio).RetornarLookPorId(id);
+    }
+}

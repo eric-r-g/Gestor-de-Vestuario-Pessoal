@@ -1,0 +1,22 @@
+package itens;
+
+import lavagem.ILavavel;
+
+public class RoupaIntima  extends Item implements ILavavel {
+	private int tamanho;
+	
+	public RoupaIntima(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, int tamanho) {
+		super(modelo, lojaOrigem, conservacao, preco);
+		this.tamanho = tamanho;
+	}
+	
+	public String getTipo() { return "intima"; }
+
+	public int getTamanho() {
+		return tamanho;
+	}
+
+	public void setTamanho(int tamanho) {
+		this.tamanho = tamanho;
+	}
+}

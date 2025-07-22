@@ -1,0 +1,63 @@
+package managers;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+
+import erros.*;
+import itens.IEmprestavel;
+import repositorios.RepositorioEmprestimo;
+
+public class EmprestimoManager extends ManagerBase <IEmprestavel> {
+	 
+	 public EmprestimoManager() {
+		 super(new RepositorioEmprestimo(100));
+	 }
+	 
+	 public int tamanhoRepositorio() { return repositorio.getTamanho(); }
+	 public ArrayList <IEmprestavel> getEmprestimos() throws ArrayVaziaException {
+		 try {
+			 return repositorio.getTodos();
+		 } catch (ArrayVaziaException e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void atualizarBD() {
+		// ToDo: fazer a função
+	 }
+	 public void inicializarDados() {
+		// ToDo: fazer a função
+	 }
+	 
+	 public void novoEmprestimo(IEmprestavel item, String nome, int ano, Month mes, int dia) throws ArrayCheiaException, ElementoExistenteException, EmprestimoException {
+		 try {
+			 LocalDate data = LocalDate.of(ano, mes, dia);
+			 repositorio.inserirElemento(item);
+			 item.registrarEmprestimo(data, nome);
+		 } catch (Exception e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void terminarEmprestimo(IEmprestavel item) throws ElementoInexistenteException, ArrayVaziaException, EmprestimoException{
+		 try {
+			 repositorio.removerElemento(item);
+			 item.registrarDevolucao();
+		 } catch (ElementoInexistenteException e) {
+			 throw e;
+		 } catch (ArrayVaziaException e) {
+			 throw e;
+		 }catch (EmprestimoException e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public long diasDeEmprestimo(IEmprestavel item) throws EmprestimoException {
+		 try {
+			 return item.quantidadeDeDiasDesdeOEmprestimo();
+		 } catch (EmprestimoException e) {
+			 throw e;
+		 }
+	 }
+}

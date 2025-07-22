@@ -1,0 +1,65 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+public class JanelaLookListar extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+
+	public JanelaLookListar(GerenciadorPaginas gerenciador) {	
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Listagens Looks");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de adicionar
+		JButton botaoAdicionar = new JButton("adicionar");
+		botaoAdicionar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_LOOKS_ADICIONAR");
+            }
+        });
+		painelSuperior.add(botaoAdicionar, BorderLayout.EAST);
+		
+		// painel listagem 
+		JPanel painelListagem = new JPanel();
+        painelListagem.setBackground(Color.GRAY);
+        painelListagem.setLayout(new BoxLayout(painelListagem, BoxLayout.Y_AXIS)); // Layout vertical
+        painelListagem.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		
+        // scroll 
+        JScrollPane painelScroll = new JScrollPane(painelListagem);
+        painelScroll.setPreferredSize(new Dimension(800, 800));
+        painelScroll.setMaximumSize(new Dimension(800, 800));
+        
+		contentPane.add(painelSuperior);
+		contentPane.add(painelScroll);
+		
+		
+		for(int i = 1; i <= 20(); i++) { // mudanças quando tiver o repositorio
+            JPanel lookPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            lookPanel.add(new JLabel("Look " + i));
+            lookPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            lookPanel.setMaximumSize(new Dimension(800, 40));
+            painelListagem.add(lookPanel);
+            painelListagem.add(Box.createVerticalStrut(5)); 
+        }
+	}
+}

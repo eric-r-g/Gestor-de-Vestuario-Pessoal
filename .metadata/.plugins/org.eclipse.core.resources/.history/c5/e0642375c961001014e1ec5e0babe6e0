@@ -1,0 +1,13 @@
+package itens;
+
+import itens.Item.estadosConservacao;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		RepositorioItem colecao = new RepositorioItem();
+		PecaInferior baixo = new PecaInferior("short", "rener", estadosConservacao.Novo, 20.0);
+		colecao.inserirItem(baixo);
+	}
+
+}

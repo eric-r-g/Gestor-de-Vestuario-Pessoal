@@ -1,0 +1,165 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+
+import erros.EntradaInvalidaException;
+import interfaceGrafica.JanelaLookAdd.ComboItem;
+import itens.IEmprestavel;
+import itens.Item;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import managers.EmprestimoManager;
+import managers.ItemManager;
+import recursosGrafico.ModeloPagina;
+
+public class JanelaEmprestimoAdd extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+	private EmprestimoManager emprestimoManager;
+	private ItemManager itemManager;
+	private JComboBox <ComboItem> dropdownItem;
+	private JComboBox <Month> dropdownMes;
+	private JTextField formDia;
+	private JTextField formAno;
+	private JTextField formNome;
+	private JPanel painelFormulario;
+	private JButton botaoSubmeter;
+	
+	
+	
+	public JanelaEmprestimoAdd(GerenciadorPaginas gerenciador, EmprestimoManager emprestimoManager, ItemManager itemManager) {
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.emprestimoManager = emprestimoManager;
+	    this.itemManager = itemManager; 
+		
+		configurarContentPane();
+	}
+	
+	protected void atualizarFormulario() {
+		painelFormulario.removeAll();
+		
+		painelFormulario.add(new JLabel("Item para emprestimo: "));
+		painelFormulario.add(dropdownItem);
+		
+		painelFormulario.add(new JLabel("Dia:"));
+		painelFormulario.add(formDia);
+		
+		painelFormulario.add(new JLabel("Mes:"));
+		painelFormulario.add(dropdownMes);
+		
+
+		painelFormulario.add(new JLabel("Ano:"));
+		painelFormulario.add(formAno);
+		
+		painelFormulario.add(new JLabel("Nome:"));
+		painelFormulario.add(formNome);
+
+		
+		painelFormulario.add(botaoSubmeter);
+		
+    	painelFormulario.revalidate();	  
+    	painelFormulario.repaint();  
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Adicionar emprestimo");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de voltar
+		JButton botaoVoltar = new JButton("voltar");
+		botaoVoltar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_EMPRESTIMOS_LISTAR");
+            }
+        });
+		
+		painelSuperior.add(botaoVoltar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelFormulario = new JPanel();
+        painelFormulario.setBackground(Color.GRAY);
+        painelFormulario.setLayout(new BoxLayout(painelFormulario, BoxLayout.Y_AXIS)); // Layout vertical
+        painelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+        painelFormulario.setPreferredSize(new Dimension(800, 800));
+        painelFormulario.setMaximumSize(new Dimension(800, 800));
+		
+        formNome = new JTextField();
+     	formNome.setPreferredSize(new Dimension(300, 30));
+     	formNome.setMaximumSize(new Dimension(300, 30));
+     	
+     	formAno = new JTextField();
+     	formAno.setPreferredSize(new Dimension(300, 30));
+     	formAno.setMaximumSize(new Dimension(300, 30));
+     	
+     	formDia = new JTextField();
+     	formDia.setPreferredSize(new Dimension(300, 30));
+     	formDia.setMaximumSize(new Dimension(300, 30));
+     	    	
+     	dropdownMes = new JComboBox<>(Month.values());
+		dropdownMes.setMaximumSize(new Dimension(300, 30));
+		
+		dropdownItem = new JComboBox<>();
+		dropdownItem.addItem(new ComboItem("", null));
+		try {
+			ArrayList <Item> elementos = itemManager.listarEmprestaveis();
+			for(Item item : elementos) {
+				dropdownItem.addItem(new ComboItem(item.getTipo() + ": " + item.getModelo(), item.getId()));
+			}
+		} catch (Exception e) {
+			System.out.print("emprst" + e);
+		}
+		dropdownItem.setMaximumSize(new Dimension(300, 30));
+
+		
+		dropdownMes.setMaximumSize(new Dimension(300, 30));
+
+		
+		// submet	
+		botaoSubmeter = new JButton("submeter");
+		botaoSubmeter.setPreferredSize(new Dimension(300, 30));
+		
+		botaoSubmeter.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			UUID id_item = ((ComboItem) dropdownItem.getSelectedItem()).getId();
+        			IEmprestavel item = null;
+        			if (id_item == null) {
+        				throw new EntradaInvalidaException("Nenhum item selecionado");
+        			} else {
+        				item = (IEmprestavel) itemManager.retornarItemPorId(id_item);
+        			}
+        			String nome = formNome.getText();
+        			int dia = Integer.valueOf(formDia.getText());
+        			System.out.print(dia);
+        			int ano = Integer.valueOf(formAno.getText());
+        			Month mes = ((Month) dropdownMes.getSelectedItem());
+        			
+        			emprestimoManager.novoEmprestimo(item, nome, ano, mes, dia);
+        			emprestimoManager.atualizarBD()
+        		} catch (Exception erro) {
+        			System.out.print(erro);
+        		}
+            }
+        });
+		
+		atualizarFormulario();
+		contentPane.add(painelSuperior);
+		contentPane.add(painelFormulario);
+	}
+}

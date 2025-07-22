@@ -1,0 +1,78 @@
+package repositorios;
+
+import java.util.ArrayList;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import itens.ILavavel;
+
+
+public class RepositorioLavagem {
+	private ArrayList <ILavavel> emprestimos;
+	private final int tamanhoMax;
+	
+	public RepositorioLavagem() {
+		tamanhoMax = 100;
+		emprestimos = new ArrayList <ILavavel>();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		tamanhoMax = tamMax;
+		emprestimos = new ArrayList <ILavavel>();
+	}
+	
+	// getters
+	public int getTamanho() { return emprestimos.size(); }
+	public ArrayList<IEmprestavel> getEmprestimos() throws ArrayVaziaException {
+		if(emprestimos.size() == 0) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		return emprestimos; 
+	}
+
+	public void inserirEmprestimo(IEmprestavel novo) throws ArrayCheiaException, ElementoExistenteException {
+		if (emprestimos.size() == tamanhoMax) {
+			throw new ArrayCheiaException("Array está vazia");			
+		}
+		for(IEmprestavel item : emprestimos) {
+			if(item.equals(novo)) {
+				throw new ElementoExistenteException("Emprestimo já existente");
+			}
+		}
+		emprestimos.add(novo);
+	}
+	
+	public IEmprestavel retornarEmprestimo(IEmprestavel item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (emprestimos.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		
+		for(int i = 0; i < emprestimos.size(); ++i) {
+			if (emprestimos.get(i).equals(item)) {
+				return emprestimos.get(i);
+			}
+		}
+		throw new ElementoInexistenteException("Emprestimo inexistente");		
+	}
+	
+	// talvez trocar por UUID
+	public void removerEmprestimo(IEmprestavel item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (emprestimos.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		boolean remocao = false;
+		
+		for(int i = 0; i < emprestimos.size(); ++i) {
+			if (emprestimos.get(i).equals(item)) {
+				emprestimos.remove(i);
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			throw new ElementoInexistenteException("Emprestimo inexistente");		
+		}
+	}
+}

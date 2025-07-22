@@ -1,0 +1,7 @@
+package erros;
+
+public class EmprestimoException extends Exception {
+	public EmprestimoException(String texto) {
+		super(texto);
+	}
+}

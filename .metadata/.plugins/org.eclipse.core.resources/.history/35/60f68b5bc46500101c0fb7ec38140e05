@@ -1,0 +1,24 @@
+package repositorios;
+
+import java.time.LocalDate;
+
+import itens.ILavavel;
+
+
+public class RepositorioLavagem extends RepositorioBase <ILavavel>{
+	
+	public RepositorioLavagem()  {
+		super();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		super(tamMax);
+	}
+	
+	public void realizarLavagem(LocalDate data) {
+		for(ILavavel item : elementos) {
+			item.AdicionarLavagem(data);
+		}
+		elementos.clear();
+	}
+}

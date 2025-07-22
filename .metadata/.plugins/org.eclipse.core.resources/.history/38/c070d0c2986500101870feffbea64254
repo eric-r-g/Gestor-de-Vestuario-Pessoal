@@ -1,0 +1,23 @@
+package repositorios;
+
+import java.util.ArrayList;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import itens.ILavavel;
+
+
+public class RepositorioLavagem extends RepositorioBase <ILavavel>{
+	
+	public RepositorioLavagem()  {
+		super();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		super(tamMax);
+	}
+	
+	
+}

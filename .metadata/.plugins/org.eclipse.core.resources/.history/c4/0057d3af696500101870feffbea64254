@@ -1,0 +1,76 @@
+package managers;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import looks.Look;
+
+import java.util.ArrayList;
+
+public class RepositorioLooks {
+	private ArrayList <Look> looks;
+	private final int tamanhoMax;
+	
+	public RepositorioLooks() {
+		tamanhoMax = 100;
+		looks = new ArrayList <Look>();
+	}
+	
+	public RepositorioLooks(int tamMax) {
+		tamanhoMax = tamMax;
+		looks = new ArrayList <Look>();
+	}
+	
+	// getters
+	public int getTamanho() { return looks.size(); }
+	public ArrayList<Look> getItens() { return looks; }
+
+	public void inserirItem(Look novo) throws ArrayCheiaException, ElementoExistenteException {
+		if (looks.size() == tamanhoMax) {
+			throw new ArrayCheiaException("Array está vazia");			
+		}
+		for(Look look : looks) {
+			if(look.equals(novo)) {
+				throw new ElementoExistenteException("Elemento já existente");
+			}
+		}
+		looks.add(novo);
+	}
+	
+	public void removerItem(Look look) throws ElementoInexistenteException, ArrayVaziaException {
+		if (looks.size() == 0) {
+			throw new ElementoInexistenteException("Array está vazia");	
+		}
+		boolean remocao = false;
+		
+		for(int i = 0; i < looks.size(); ++i) {
+			if (looks.get(i).equals(look)) {
+				looks.remove(i);
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			throw new ElementoInexistenteException("Look inexistente");		
+		}
+	}
+	
+	public void utilizarLook(Look look) throws ElementoInexistenteException {
+		if (getTamanho() == 0) {
+			// subir erro de impossivel de utilizar
+		}
+		boolean utilizar = false;
+		for(int i = 0; i < getTamanho(); ++i) {
+			if (looks.get(i).equals(look)) {
+				// acao de utilizar o look
+				utilizar = true;
+				break;
+			}
+		}
+		
+		if(!utilizar) {
+			throw new ElementoInexistenteException("Look inexiste");
+		}
+	}
+}

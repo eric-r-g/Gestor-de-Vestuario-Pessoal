@@ -1,0 +1,18 @@
+package recursosGrafico;
+
+import java.awt.Color;
+
+import javax.swing.BoxLayout;
+
+import interfaceGrafica.GerenciadorPaginas;
+
+public abstract class ModeloJanelaListar extends ModeloPagina {
+	private static final long serialVersionUID = 1L;
+
+	public ModeloJanelaListar(GerenciadorPaginas gerenciador) {
+		super(gerenciador);
+	}
+	
+	contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+	contentPane.setBackground(Color.WHITE);
+}

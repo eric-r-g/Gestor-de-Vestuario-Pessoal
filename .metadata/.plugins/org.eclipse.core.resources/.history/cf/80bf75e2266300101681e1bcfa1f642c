@@ -1,0 +1,10 @@
+package interfaceGrafica;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		GerenciadorPaginas gerenciador = new GerenciadorPaginas();
+		gerenciador.mostrarTela("TELA_ITENS_LISTAR");
+	}
+
+}

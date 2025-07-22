@@ -1,0 +1,18 @@
+package managers;
+
+import itens.ILavavel;
+import repositorios.RepositorioLavagem;
+
+public class LavagemManager extends ManagerBase<ILavavel>{
+	public LavagemManager(BDManager bdManager) {
+		super(new RepositorioLavagem());
+	}
+	
+	public void atualizarBD() {
+    	
+    }
+	
+    public void inicializarDados() {
+    	
+    }
+}

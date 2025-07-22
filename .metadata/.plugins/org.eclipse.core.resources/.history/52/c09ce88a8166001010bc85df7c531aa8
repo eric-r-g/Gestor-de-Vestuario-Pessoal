@@ -1,0 +1,225 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import itens.Acessorio;
+import itens.Calcado;
+import itens.Item;
+import itens.PecaInferior;
+import itens.PecaSuperior;
+import itens.PecaUnica;
+import managers.LookManager;
+import managers.EmprestimoManager;
+import managers.ItemManager;
+import erros.ArrayVaziaException;
+import erros.ElementoInexistenteException;
+import erros.EntradaInvalidaException;
+
+public class JanelaEmprestimoAdd extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+	private EmprestimoManager emprestimoManager;
+	private ItemManager itemManager;
+	private JComboBox <ComboItem> dropdownAcessorio;
+	private JComboBox <ComboItem> dropdownCalcado;
+	private JComboBox <ComboItem> dropdownUnica;
+	private JComboBox <ComboItem> dropdownSuperior;
+	private JComboBox <ComboItem> dropdownInferior;
+	private JPanel painelFormulario;
+	private JButton botaoSubmeter;
+	
+	
+	public JanelaEmprestimoAdd(GerenciadorPaginas gerenciador, EmprestimoManager emprestimoManager, ItemManager itemManager) {
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.emprestimoManager = emprestimoManager;
+	    this.itemManager = itemManager; 
+		
+		configurarContentPane();
+	}
+	
+	protected void atualizarFormulario() {
+		painelFormulario.removeAll();
+		
+		painelFormulario.add(new JLabel("Acessorio:"));
+		painelFormulario.add(dropdownAcessorio);
+		
+		painelFormulario.add(new JLabel("Calcado:"));
+		painelFormulario.add(dropdownCalcado);
+		
+		painelFormulario.add(new JLabel("Parte Superior:"));
+		painelFormulario.add(dropdownSuperior);
+		
+		painelFormulario.add(new JLabel("Parte Inferior"));
+		painelFormulario.add(dropdownInferior);
+		
+		painelFormulario.add(new JLabel("Parte Unica"));
+		painelFormulario.add(dropdownUnica);	
+		
+		
+		painelFormulario.add(botaoSubmeter);
+		
+    	painelFormulario.revalidate();	  
+    	painelFormulario.repaint();  
+	}
+	
+	class ComboItem {
+        private String modelo;  // Texto visível no ComboBox
+        private UUID id;       // ID oculto
+
+        public ComboItem(String modelo, UUID id) {
+            this.modelo = modelo;
+            this.id = id;
+        }
+
+        public String getTexto() {
+            return modelo;
+        }
+
+        public UUID getId() {
+            return id;
+        }
+
+        public String toString() {
+            return modelo;  // Isso é o que será exibido no JComboBox
+        }
+    }
+    
+	protected JComboBox <ComboItem> criarDropdown(String texto) {
+		JComboBox <ComboItem> dropdown = new JComboBox <ComboItem>();
+		dropdown.addItem(new ComboItem("", null));
+		dropdown.setMaximumSize(new Dimension(300, 30));
+		
+		
+		try {
+            ArrayList <Item> itens = itemManager.listarPorTipo(texto);
+               		
+    		for(Item item : itens) {
+    	        dropdown.addItem(new ComboItem(item.getModelo(), item.getId()));    		
+    	    }
+        } catch (Exception e) {
+        	System.out.print(e);
+        }
+		
+		return dropdown;
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Adicionar Look");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de voltar
+		JButton botaoVoltar = new JButton("voltar");
+		botaoVoltar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_LOOKS_LISTAR");
+            }
+        });
+		
+		painelSuperior.add(botaoVoltar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelFormulario = new JPanel();
+        painelFormulario.setBackground(Color.GRAY);
+        painelFormulario.setLayout(new BoxLayout(painelFormulario, BoxLayout.Y_AXIS)); // Layout vertical
+        painelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+        painelFormulario.setPreferredSize(new Dimension(800, 800));
+        painelFormulario.setMaximumSize(new Dimension(800, 800));
+		
+		// campo Acessorio	
+		dropdownCalcado = criarDropdown("calcado");
+		dropdownSuperior = criarDropdown("superior");
+		dropdownInferior = criarDropdown("inferior");
+		dropdownUnica = criarDropdown("unica");
+		dropdownAcessorio = criarDropdown("acessorio");
+		
+		// submeter	
+		botaoSubmeter = new JButton("submeter");
+		botaoSubmeter.setPreferredSize(new Dimension(300, 30));
+		
+		botaoSubmeter.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			boolean modo1 = false;
+        			boolean modo2 = false;
+        			Acessorio acessorio = null;
+        			Calcado calcado = null;
+        			PecaSuperior superior = null;
+        			PecaInferior inferior = null;
+        			PecaUnica unica = null;
+        			
+        			// talvez mudar a forma da logica
+        			UUID idAcessorio = ((ComboItem) dropdownAcessorio.getSelectedItem()).getId();
+        			if(idAcessorio != null) {
+        				acessorio = (Acessorio) itemManager.retornarItemPorId(idAcessorio);
+        			}
+        			
+	                UUID idCalcado = ((ComboItem) dropdownCalcado.getSelectedItem()).getId();
+	                if(idCalcado != null) {
+	                	calcado = (Calcado) itemManager.retornarItemPorId(idCalcado);
+	                }
+	                
+	                UUID idSuperior = ((ComboItem) dropdownSuperior.getSelectedItem()).getId();
+	                if(idSuperior != null) {
+	                	superior = (PecaSuperior) itemManager.retornarItemPorId(idSuperior);
+	                	modo1 = true;
+	                }
+
+	                UUID idInferior = ((ComboItem) dropdownInferior.getSelectedItem()).getId();
+	                if(idInferior != null) {
+	                	inferior = (PecaInferior) itemManager.retornarItemPorId(idInferior);
+	                	modo1 = true;
+	                }
+
+	                UUID idUnica = ((ComboItem) dropdownUnica.getSelectedItem()).getId();
+	                if(idUnica != null) {
+	                	unica = (PecaUnica) itemManager.retornarItemPorId(idUnica);
+	                	modo2 = true;
+	                }
+	                
+	                try {
+	                	if((modo1 && modo2) || (!modo1 && !modo2)) {
+	                		throw new EntradaInvalidaException("entrada invalida");
+	                	} 
+	                	if (modo1) {
+	                		if (idAcessorio != null) {
+	                			lookManager.adicionarLook(calcado, superior, inferior, acessorio);
+	                		} else {
+	                			lookManager.adicionarLook(calcado, superior, inferior);
+	                		}
+	                	} else {
+	                		if (idAcessorio != null) {
+	                			lookManager.adicionarLook(calcado, unica, acessorio);
+	                		} else {
+	                			lookManager.adicionarLook(calcado, unica);
+	                		}
+	                	}
+	                	lookManager.atualizarBD();
+	                } catch (Exception erro) {
+	                	System.out.print(erro);
+	                }
+        		} catch (ArrayVaziaException | ElementoInexistenteException erro) {
+        			System.out.print(erro); 		
+        		}
+            }
+        });
+		
+		atualizarFormulario();
+		contentPane.add(painelSuperior);
+		contentPane.add(painelFormulario);
+	}
+}

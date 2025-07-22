@@ -1,0 +1,18 @@
+package itens;
+
+import java.time.LocalDate;
+
+public class Utilizacao {
+    private LocalDate data;
+    private String local;
+    
+    public Utilizacao(LocalDate data, String local) {
+        this.data = data;
+        this.local = local;
+    }
+    
+    public LocalDate getData() { return data; }
+    public String getLocal() { return local; }
+    
+    public String toString() { return "(" + local + ", " + data + ")"; }
+}

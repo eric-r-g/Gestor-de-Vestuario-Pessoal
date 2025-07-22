@@ -1,0 +1,27 @@
+package managers;
+
+import java.time.LocalDate;
+import java.time.Month;
+
+import itens.ILavavel;
+import repositorios.RepositorioLavagem;
+
+public class LavagemManager extends ManagerBase<ILavavel>{
+	public LavagemManager(BDManager bdManager) {
+		super(new RepositorioLavagem());
+	}
+	
+	public void atualizarBD() {
+    	
+    }
+	
+    public void inicializarDados() {
+    	
+    }
+    
+    public void realizarLavagem(int ano, Month mes, int dia) {
+    	LocalDate data = LocalDate.of(ano, mes, dia);
+    	((RepositorioLavagem) elementos).realizarLavagem();
+    }
+    
+}

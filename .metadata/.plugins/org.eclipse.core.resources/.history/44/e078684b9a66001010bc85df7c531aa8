@@ -1,0 +1,80 @@
+package interfaceGrafica;
+
+
+import javax.swing.*;
+import java.awt.*;
+
+import managers.*;
+
+public class GerenciadorPaginas {
+	protected BDManager bdManager;
+	protected ItemManager itemManager;
+	protected EmprestimoManager emprestimoManager;
+	protected LookManager lookManager;
+	protected LavagemManager lavagemManager;
+	
+	protected JFrame framePrincipal;
+	protected CardLayout layout;
+	protected JPanel cardPanel;
+	protected JanelaItensListar JIListar;
+	protected JanelaLookListar JLListar;
+	protected JanelaEmprestimoListar JEListar;
+
+	public GerenciadorPaginas(){
+			bdManager = new BDManager();
+			itemManager = new ItemManager(bdManager);
+			lookManager = new LookManager(bdManager, itemManager);
+			emprestimoManager = new EmprestimoManager();
+			
+            criarJanela();
+	}
+	
+	public void criarJanela() {
+		// cria o fram principal
+		framePrincipal = new JFrame("navegacao");
+		framePrincipal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		framePrincipal.setSize(new Dimension(1200, 900));
+		
+		// cria e prepara o cardPanel
+		layout = new CardLayout();
+		cardPanel = new JPanel(layout);
+		framePrincipal.add(cardPanel);
+		
+		// adiciona cada uma das janelas aqui
+		JIListar = new JanelaItensListar(this, itemManager, bdManager);
+		cardPanel.add(JIListar, "TELA_ITENS_LISTAR");
+		
+		JanelaItensAdd JIAdd = new JanelaItensAdd(this, itemManager);
+		cardPanel.add(JIAdd, "TELA_ITENS_ADICIONAR");
+		
+		JLListar = new JanelaLookListar(this, lookManager, bdManager);
+		cardPanel.add(JLListar, "TELA_LOOKS_LISTAR");
+		
+		JanelaLookAdd JLAdd = new JanelaLookAdd(this, lookManager, itemManager);
+		cardPanel.add(JLAdd, "TELA_LOOKS_ADICIONAR");
+		
+		JEListar = new JanelaEmprestimoListar(this, emprestimoManager, bdManager);
+		cardPanel.add(JEListar, "TELA_EMPRESTIMOS_LISTAR");
+		
+		JanelaEmprestimoAdd JEAdd = new JanelaEmprestimoAdd(this, emprestimoManager, itemManager);
+		cardPanel.add(JEAdd, "TELA_EMPRESTIMOS_ADICIONAR");
+		
+		// configurações finais
+		framePrincipal.setLocationRelativeTo(null);
+		framePrincipal.setVisible(true);
+		mostrarTela("TELA_ITENS_LISTAR");
+	}
+	
+	public void mostrarTela(String nomeTela) {
+		// define qual tela vai ser mostrada (e faz as devidas preparações de cada tela
+        layout.show(cardPanel, nomeTela);
+        if (nomeTela.equals("TELA_ITENS_LISTAR")) {
+        	JIListar.atualizarListagem();
+        } else if (nomeTela.equals("TELA_LOOKS_LISTAR")) {
+        	JLListar.atualizarListagem();
+        } else if (nomeTela.equals("TELA_EMPRESTIMOS_LISTAR")) {
+        	JEListar.atualizarListagem();
+        }
+    }
+	
+}

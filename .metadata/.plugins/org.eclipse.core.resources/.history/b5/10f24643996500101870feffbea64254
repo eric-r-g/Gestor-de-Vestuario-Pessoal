@@ -1,0 +1,20 @@
+package repositorios;
+
+import erros.*;
+import itens.Look;
+
+public class RepositorioLooks extends RepositorioBase <Look> {
+	
+	
+	public void utilizarLook(Look look) throws ElementoInexistenteException, ArrayVaziaException {
+		if (elementos.isEmpty()) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		int index = elementos.indexOf(look);
+		
+        if (index == -1) {
+            throw new ElementoInexistenteException("Elemento inexistente");
+        }
+        // ToDo: ação de utilizar o look
+	}
+}

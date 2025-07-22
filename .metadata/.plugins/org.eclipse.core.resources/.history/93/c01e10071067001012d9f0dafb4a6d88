@@ -1,0 +1,103 @@
+package interfaceGrafica;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import erros.ArrayVaziaException;
+import interfaceGrafica.JanelaLookAdd.ComboItem;
+import itens.ILavavel;
+import itens.Item;
+import managers.BDManager;
+import managers.ItemManager;
+import managers.LavagemManager;
+import recursosGrafico.ModeloJanelaListar;
+
+public class JanelaLavagemListar extends ModeloJanelaListar <ILavavel>{
+	private static final long serialVersionUID = 1L;
+	protected LavagemManager lavagemManager;
+	private ItemManager itemManager;
+	private JComboBox <ComboItem> dropdownItem;
+	private JButton botaoSubmeter;
+	protected BDManager bdManager;
+	
+	public JanelaLavagemListar(GerenciadorPaginas gerenciador, LavagemManager lavagemManager, ItemManager itemManager, BDManager bdManager) {
+		super(gerenciador, "Listagem Lavagens", "TELA_LAVAGENS_LISTAR");
+		this.lavagemManager = lavagemManager;
+		this.bdManager = bdManager;
+		this.itemManager = itemManager;
+		
+		atualizarListagem();
+		configuracoesExtrasContentPanel();
+	}
+	
+	protected void configuracoesExtrasContentPanel() {
+		JPanel submissaoLavagem = new JPanel(new BorderLayout());
+		submissaoLavagem.setMaximumSize(new Dimension(700, 60));
+		JLabel texto = new JLabel("Adicionar item: ");
+		texto.setMaximumSize(new Dimension(50, 30));
+		
+		submissaoLavagem.add(texto, BorderLayout.WEST);
+		
+		dropdownItem = new JComboBox<>();
+		dropdownItem.addItem(new ComboItem("", null));
+		dropdownItem.setMaximumSize(new Dimension(300, 30));
+		
+		submissaoLavagem.add(dropdownItem, BorderLayout.CENTER);
+		
+		try {
+			ArrayList <Item> itens = itemManager.listarLavaveis();
+			for(Item item : itens) {
+				dropdownItem.addItem(new ComboItem(item.getTipo() + ": " + item.getModelo(), item.getId()));
+			}
+		} catch (Exception e) {
+			System.out.print(e);
+		}
+		
+		botaoSubmeter = new JButton("Teste");
+		botaoSubmeter.setMaximumSize(new Dimension(150, 30));
+		
+		
+		
+		submissaoLavagem.add(botaoSubmeter, BorderLayout.EAST);
+		
+		contentPane.add(submissaoLavagem);
+	}
+
+	protected ArrayList<ILavavel> obterListagem() throws ArrayVaziaException {
+		return lavagemManager.listarTodos();
+	}
+	
+	protected JPanel obterPainelItem(ILavavel item) {
+		JPanel itemPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		itemPanel.add(new JLabel(item.getModelo() + ": " + item.getQuantidadeLavagens()));
+		
+        JButton butaoDelete = new JButton("Deletar");
+        butaoDelete.putClientProperty("id", item.getId());
+        
+        butaoDelete.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		UUID id = (UUID) butaoDelete.getClientProperty("id");
+        		try {
+        			ILavavel removido = lavagemManager.retornarLavagemPorId(id);
+        			lavagemManager.remover(removido);
+        		} catch (Exception erro) {
+        			System.out.print(erro);
+        		}
+        		atualizarListagem();
+            }
+        });
+		
+		return itemPanel;
+	}
+
+}

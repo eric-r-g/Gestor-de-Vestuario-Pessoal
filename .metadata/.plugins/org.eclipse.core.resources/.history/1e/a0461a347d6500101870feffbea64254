@@ -1,0 +1,10 @@
+package itens;
+
+import java.time.LocalDate;
+
+public interface IEmprestavel {
+	private Item item;
+	public void registrarEmprestimo(LocalDate data);
+	public long quantidadeDeDiasDesdeOEmprestimo();
+	public void registrarDevolucao();
+}

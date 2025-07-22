@@ -1,0 +1,98 @@
+package managers;
+
+import java.sql.*;
+import itens.*;
+
+public class BDManager {
+	private String arquivoBanco = "banco.db";
+	private String url = "jdbc:sqlite:" + arquivoBanco;
+	private Connection conn;
+	
+
+	public BDManager() {
+		int i = 5;
+		while(i-- > 0){ // tenta se conectar até 5 vezes
+			try {
+				// conecta ao sqlte
+				conn = DriverManager.getConnection(url);
+	            Statement stmt = conn.createStatement();
+	            
+	            // criação dos bancos (se não existirem)
+	            String sqlItens = "CREATE TABLE IF NOT EXISTS itens ("
+	                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+	                    + "tipo TEXT NOT NULL,"
+	                    + "modelo TEXT NOT NULL,"
+	                    + "loja_origem TEXT NOT NULL,"
+	                    + "estado_conservacao TEXT NOT NULL,"
+	                    + "preco REAL NOT NULL,"
+	                    + "numeracao INTEGER,"
+	                    + "tamanho INTEGER,"
+	                    + "material TEXT,"
+	                    + "externo INTEGER)";
+	            
+	            // vai ter ainda o dos looks
+	            
+	            // execução dos statements
+	            stmt.execute(sqlItens);
+				break;
+	        } catch (SQLException e) {
+	            System.err.println("Erro ao criar o arquivo SQLite: " + e.getMessage());
+	        }
+		}
+	}
+	
+	public void inserirItem(Item item) throws SQLException {
+		try {
+			String sql = "INSERT INTO itens (tipo, modelo, loja_origem, estado_conservacao, preco, numeracao, tamanho, material, externo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			
+			String tipo = item.getTipo();
+			
+			pstmt.setString(1, tipo);
+			pstmt.setString(2, item.getModelo());
+			pstmt.setString(3, item.getLojaOrigem());
+			pstmt.setString(4, item.getConservacao().toString());
+			pstmt.setDouble(5, item.getPreco());
+			
+			switch(tipo) {
+				case "acessorio" -> pstmt.setString(8, ((Acessorio) item).getMaterial());
+				case "calcado" -> pstmt.setInt(6, ((Calcado) item).getNumeracao());
+				case "inferior" -> pstmt.setInt(7, ((PecaInferior) item).getTamanho());
+				case "unica" -> pstmt.setInt(7, ((PecaUnica) item).getTamanho());
+				case "intima" -> pstmt.setInt(7, ((RoupaIntima) item).getTamanho());
+				case "superior" -> {
+					pstmt.setInt(7, ((PecaSuperior) item).getTamanho());
+					if(((PecaSuperior) item).isExterno()){
+						pstmt.setInt(9, 1);
+					} else {
+						pstmt.setInt(9, 0);
+					}
+				}
+			}
+
+            pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			throw e;
+		}
+	}
+	
+
+	public ResultSet listarItens() throws SQLException {
+		try {
+			String sql = "SELECT * FROM itens";
+			Statement stmt = conn.createStatement();
+			return stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			throw e;		
+		}
+
+	}
+	
+	public void removerItem(Item item) throws SQLException {
+		String sql = "DELETE FROM looks WHERE id = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, item.getId().toString());
+	}
+	
+}

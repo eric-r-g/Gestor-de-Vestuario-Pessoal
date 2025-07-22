@@ -1,0 +1,123 @@
+package managers;
+
+import java.sql.*;
+
+import erros.ElementoInexistenteException;
+import itens.*;
+
+public class BDManager {
+	private String arquivoBanco = "banco.db";
+	private String url = "jdbc:sqlite:" + arquivoBanco;
+	private Connection conn;
+	
+
+	public BDManager() {
+		int i = 5;
+		while(i-- > 0){ // tenta se conectar até 5 vezes
+			try {
+				// conecta ao sqlte
+				conn = DriverManager.getConnection(url);
+	            Statement stmt = conn.createStatement();
+	            
+	            // criação dos bancos (se não existirem)
+	            String sqlItens = "CREATE TABLE IF NOT EXISTS itens ("
+	                    + "id TEXT PRIMARY KEY,"
+	                    + "tipo TEXT NOT NULL,"
+	                    + "modelo TEXT NOT NULL,"
+	                    + "loja_origem TEXT NOT NULL,"
+	                    + "estado_conservacao TEXT NOT NULL,"
+	                    + "preco REAL NOT NULL,"
+	                    + "numeracao INTEGER,"
+	                    + "tamanho INTEGER,"
+	                    + "material TEXT,"
+	                    + "externo INTEGER)";
+	           
+	            
+	            String sqlLooks = "CREATE TABLE IF NOT EXISTS looks ("
+	                    + "id TEXT PRIMARY KEY,"
+	                    + "id_superior TEXT,"
+	                    + "id_inferior TEXT,"
+	            		+ "id_unica TEXT,"
+	            		+ "id_calcado TEXT,"
+	            		+ "id_acessorio TEXT)";
+	            
+	            String sqlEmprestimos = "CREATE TABLE IF NOT EXISTS emprestimos ("
+	                    + "id TEXT PRIMARY KEY,"
+	                    + "id_item TEXT NOT NULL,"
+	                    + "data TEXT NOT NULL,"
+	            		+ "local TEXT NOT NULL)";
+
+	            
+	            // execução dos statements
+	            stmt.execute(sqlItens);
+	            stmt.execute(sqlLooks);
+	            stmt.execute(sqlEmprestimos);
+				break;
+	        } catch (SQLException e) {
+	            System.err.println("Erro ao criar o arquivo SQLite: " + e.getMessage());
+	        }
+		}
+	}
+	
+	public void inserirItem(Item item) throws SQLException {
+		try {
+			String sql = "INSERT INTO itens (id, tipo, modelo, loja_origem, estado_conservacao, preco, numeracao, tamanho, material, externo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			
+			String tipo = item.getTipo();
+			
+			pstmt.setString(1, item.getId().toString());
+			pstmt.setString(2, tipo);
+			pstmt.setString(3, item.getModelo());
+			pstmt.setString(4, item.getLojaOrigem());
+			pstmt.setString(5, item.getConservacao().toString());
+			pstmt.setDouble(6, item.getPreco());
+			
+			switch(tipo) {
+				case "acessorio" -> pstmt.setString(9, ((Acessorio) item).getMaterial());
+				case "calcado" -> pstmt.setInt(7, ((Calcado) item).getNumeracao());
+				case "inferior" -> pstmt.setInt(8, ((PecaInferior) item).getTamanho());
+				case "unica" -> pstmt.setInt(8, ((PecaUnica) item).getTamanho());
+				case "intima" -> pstmt.setInt(8, ((RoupaIntima) item).getTamanho());
+				case "superior" -> {
+					pstmt.setInt(8, ((PecaSuperior) item).getTamanho());
+					if(((PecaSuperior) item).isExterno()){
+						pstmt.setInt(10, 1);
+					} else {
+						pstmt.setInt(10, 0);
+					}
+				}
+			}
+
+            pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			throw e;
+		}
+	}
+	
+
+	public ResultSet listarItens() throws SQLException {
+		try {
+			String sql = "SELECT * FROM itens";
+			Statement stmt = conn.createStatement();
+			return stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			throw e;		
+		}
+
+	}
+	
+	public void removerItem(Item item) throws SQLException, ElementoInexistenteException {
+		String sql = "DELETE FROM itens WHERE id = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, item.getId().toString());
+		
+		int retorno = pstmt.executeUpdate();
+        
+        if (retorno < 1) {
+        	throw new ElementoInexistenteException("elemento não presente no BD");
+        }
+	}
+	
+}

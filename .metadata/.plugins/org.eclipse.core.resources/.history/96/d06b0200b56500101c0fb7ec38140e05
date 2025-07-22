@@ -1,0 +1,93 @@
+package managers;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import erros.*;
+import itens.Item.*;
+import managers.BDManager.itensTemp;
+import repositorios.RepositorioItem;
+import itens.*;
+
+public class ItemManager extends ManagerBase <Item> {
+	private BDManager bdManager;
+	
+	public ItemManager(BDManager bdManager) {
+		super(new RepositorioItem());
+		this.bdManager = bdManager;
+		inicializarDados();
+	}
+	
+	
+	public void atualizarBD() {
+		try {
+			ArrayList <Item> lista = listarTodos();
+			for(Item item : lista) {
+				bdManager.inserirItem(item);
+			}
+		} catch (ArrayVaziaException e) {
+			// ToDo: tratamento de erro
+		}
+	}
+	
+	public void inicializarDados() {
+		
+		itensTemp d = bdManager.listarItens();
+		for(int i = 0; i < d.tipos().size(); ++i) {
+			try { //ToDo: mudar a forma que ele está recebendo os dados e o uso do hashmap
+				adicionarItemPorDados(tipoItem.fromString(d.tipos().get(i)), d.modelos().get(i), d.lojasOrigem().get(i), d.conservacaos().get(i), d.precos().get(i), new HashMap<String, String>());
+			} catch (Exception e) {
+				// ToDo: tratamento de erro
+			}
+		}
+	}
+	
+	public Item criarItem(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException {
+		Item novo = null;
+		try {
+			novo = switch (tipo) {
+				case INFERIOR -> new PecaInferior(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case UNICA -> new PecaUnica(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case SUPERIOR -> new PecaSuperior(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")), Boolean.valueOf(extras.get("externo")));
+				case CALCADO -> new Calcado(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("numeracao")));
+				case INTIMA -> new RoupaIntima(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case ACESSORIO -> new Acessorio(modelo, lojaOrigem, conservacao, preco, extras.get("material"));
+				default -> throw new EntradaInvalidaException("Tipo invalido");
+			};
+		} catch (Exception e) {
+			throw new EntradaInvalidaException("Argumentação invalida" + e.toString());
+		}
+		
+		return novo;
+	}
+	
+	public void adicionarItemPorDados(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException {
+		Item novo = null;
+		try {
+			novo = criarItem(tipo, modelo, lojaOrigem, conservacao, preco, extras);
+		} catch (EntradaInvalidaException e) {
+			throw new EntradaInvalidaException("Argumentação invalida");
+		}
+		
+		try {
+			adicionar(novo);
+		} catch (ArrayCheiaException | ElementoExistenteException e) {
+			// ToDo: lidar erro
+		}
+	}
+	
+	public void atualizarItem(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras, Item antigo) throws EntradaInvalidaException {
+		Item novo = null;
+		try {
+			novo = criarItem(tipo, modelo, lojaOrigem, conservacao, preco, extras);
+		} catch (EntradaInvalidaException e) {
+			throw new EntradaInvalidaException("Argumentação invalida");
+		}
+		
+		try {
+			repositorio.atualizarElemento(antigo, novo);
+		} catch (ArrayVaziaException | ElementoInexistenteException | ElementoExistenteException e) {
+			// ToDo: lidar erro
+		}
+	}
+}

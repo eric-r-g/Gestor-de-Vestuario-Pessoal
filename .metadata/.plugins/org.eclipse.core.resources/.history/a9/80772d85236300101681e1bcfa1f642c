@@ -1,0 +1,41 @@
+package looks;
+
+import java.util.UUID;
+import itens.*;
+
+public class Look {
+	private final UUID id;
+	private PecaSuperior superior;
+	private PecaInferior inferior;
+	private PecaUnica unica;
+	private Calcado calcado;
+	private Acessorio[] acessorios;
+	
+	public Look (PecaSuperior superior, PecaInferior inferior, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.inferior = inferior;
+		this.superior = superior;
+		this.calcado = calcado;
+	}
+	
+	public Look (PecaUnica unica, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.unica = unica;
+		this.calcado = calcado;
+	}
+	
+	
+	//getters
+	public PecaSuperior getSuperior() { return superior; }
+	public PecaInferior getInferior() { return inferior; }
+	public UUID getId() { return id; }
+	public PecaUnica getUnica() { return unica; }
+	public Calcado getCalcado() { return calcado; }
+	
+	//setters
+	public void setUnica(PecaUnica unica) { this.unica = unica; }
+	public void setCalcado(Calcado calcado) { this.calcado = calcado; }
+	public void setSuperior(PecaSuperior superior) { this.superior = superior; }
+	public void setInferior(PecaInferior inferior) { this.inferior = inferior; }
+
+}

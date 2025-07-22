@@ -1,0 +1,11 @@
+package itens;
+
+import java.time.LocalDate;
+
+import erros.EmprestimoException;
+
+public interface IEmprestavel {
+	public void registrarEmprestimo(LocalDate data, String nome) throws EmprestimoException;
+	public long quantidadeDeDiasDesdeOEmprestimo() throws EmprestimoException;
+	public void registrarDevolucao() throws EmprestimoException;
+}

@@ -1,0 +1,88 @@
+package itens;
+
+import java.util.UUID;
+// item genérico do vestuario
+public abstract class Item {
+	private final UUID id;
+	private String modelo;
+	private String lojaOrigem;
+	private double preco;
+	private int numeroDeUsos;
+	
+	public enum estadosConservacao{
+		NOVO("novo"), 
+		USADO("usado"), 
+		DANIFICADO("danificado");
+		
+		private final String status;
+		
+		private estadosConservacao(String status) {
+			this.status = status;
+		}
+		
+		public String toString() {
+			return status;
+		}
+		
+		public static estadosConservacao fromString(String texto) {
+	        for (estadosConservacao estado : estadosConservacao.values()) {
+	            if (estado.status.equalsIgnoreCase(texto)) { // Comparação case-insensitive
+	                return estado;
+	            }
+	        }
+	        throw new IllegalArgumentException("Estado de conservação inválido: " + texto);
+	    }
+	}
+	
+	public enum tipoItem{
+		Novo("novo"), 
+		Usado("usado"), 
+		Danificado("danificado");
+		
+		private final String status;
+		
+		private estadosConservacao(String status) {
+			this.status = status;
+		}
+		
+		public String toString() {
+			return status;
+		}
+		
+		public static estadosConservacao fromString(String texto) {
+	        for (estadosConservacao estado : estadosConservacao.values()) {
+	            if (estado.status.equalsIgnoreCase(texto)) { // Comparação case-insensitive
+	                return estado;
+	            }
+	        }
+	        throw new IllegalArgumentException("Estado de conservação inválido: " + texto);
+	    }
+	}
+	
+	
+	private estadosConservacao conservacao;
+	
+	public Item(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco) {
+		this.id = UUID.randomUUID();
+		setModelo(modelo);
+		setLojaOrigem(lojaOrigem);
+		setConservacao(conservacao);
+		setPreco(preco);
+		setNumeroDeUsos(0);
+	}
+	
+	// getters
+	public UUID getId() { return id; }
+	public double getPreco() { return preco; }
+	public String getLojaOrigem() { return lojaOrigem; }
+	public String getModelo() { return modelo; }
+	public estadosConservacao getConservacao() { return conservacao; }
+	public int getNumeroDeUsos() { return numeroDeUsos; }
+	public abstract String getTipo();
+	// setters
+	public void setNumeroDeUsos(int numeroDeUsos) { this.numeroDeUsos = numeroDeUsos; }
+	public void setPreco(double preco) { this.preco = preco; }
+	public void setLojaOrigem(String lojaOrigem) { this.lojaOrigem = lojaOrigem; }
+	public void setModelo(String modelo) { this.modelo = modelo; }
+	public void setConservacao(estadosConservacao conservacao) { this.conservacao = conservacao; }
+}

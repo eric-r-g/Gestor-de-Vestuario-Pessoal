@@ -1,0 +1,81 @@
+package recursosGrafico;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.ArrayList;
+
+import interfaceGrafica.GerenciadorPaginas;
+
+public abstract class ModeloJanelaListar <T> extends ModeloPagina {
+	private static final long serialVersionUID = 1L;
+	protected JPanel painelListagem;
+	protected GerenciadorPaginas gerenciador;
+	protected String titulo;
+	protected String telaAdicionar;
+
+	public ModeloJanelaListar(GerenciadorPaginas gerenciador, String titulo, String telaAdicionar) {
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.titulo = titulo;
+		this.telaAdicionar = telaAdicionar;
+		
+		configurarContentPane();
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel(titulo);
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de adicionar
+		JButton botaoAdicionar = new JButton("adicionar");
+		botaoAdicionar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela(telaAdicionar);
+            }
+        });
+		
+		painelSuperior.add(botaoAdicionar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelListagem = new JPanel();
+        painelListagem.setBackground(Color.GRAY);
+        painelListagem.setLayout(new BoxLayout(painelListagem, BoxLayout.Y_AXIS)); // Layout vertical
+        painelListagem.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		
+        // scroll 
+        JScrollPane painelScroll = new JScrollPane(painelListagem);
+        painelScroll.setPreferredSize(new Dimension(800, 800));
+        painelScroll.setMaximumSize(new Dimension(800, 800));
+        
+		contentPane.add(painelSuperior);
+		contentPane.add(painelScroll);
+	}
+	
+	protected void atualizarListagem() {
+		painelListagem.removeAll();
+		try {
+			ArrayList <T> elementos = obterListagem();
+		}
+		else {
+			for (T elemento : elementos) {
+				JPanel painelItem = obterPainelItem(elemento);
+				painelListagem.add(painelItem);
+				painelListagem.add(Box.createVerticalStrut(5));
+			}
+		}
+	}
+	
+	protected abstract ArrayList <T> obterListagem() throw ArrayVaziaException;
+	protected abstract JPanel obterPainelItem(T item);
+}

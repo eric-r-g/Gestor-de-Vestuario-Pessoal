@@ -1,0 +1,81 @@
+package managers;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+import itens.Acessorio;
+import itens.Calcado;
+import itens.Item;
+import itens.Look;
+import itens.PecaInferior;
+import itens.PecaSuperior;
+import itens.PecaUnica;
+import repositorios.RepositorioLooks;
+
+public class LookManager extends ManagerBase<Look>{
+	private BDManager bdManager;
+	
+	public LookManager(BDManager bdManager) {
+		super(new RepositorioLooks());
+		this.bdManager = bdManager;	
+	}
+	
+    public void atualizarBD() {
+    	try {
+			ArrayList <Look> lista = listarTodos();
+			for(Look look : lista) {
+				try {
+					bdManager.inserirLook(look);
+				} catch (SQLException e) {
+					System.out.print(e);
+				}
+			}
+		} catch (ArrayVaziaException e) {
+			System.out.print(e);
+		} 
+    }
+    public void inicializarDados() {
+    	
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaUnica unica) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(unica, calcado);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaSuperior superior, PecaInferior inferior) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(superior, inferior, calcado);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaUnica unica, Acessorio acessorio) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(unica, calcado);
+    	novo.atualizarLook(acessorio);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void adicionarLook(Calcado calcado, PecaSuperior superior, PecaInferior inferior, Acessorio acessorio) throws ElementoExistenteException, ArrayCheiaException {
+    	Look novo = new Look(superior, inferior, calcado);
+    	novo.atualizarLook(acessorio);
+    	repositorio.inserirElemento(novo);
+    }
+    
+    public void atualizarLook(Look look, ArrayList <Item> itens) throws ElementoInexistenteException, ArrayVaziaException  {
+    	((RepositorioLooks) repositorio).atualizarElemento(look, itens);
+    }
+    
+    public void utilizarLook(Look look, String local, int ano, Month mes, int dia) throws ElementoInexistenteException, ArrayVaziaException {
+    	LocalDate data = LocalDate.of(ano, mes, dia);
+    	((RepositorioLooks) repositorio).utilizarLook(look, local, data);
+    }
+    
+    public Look RetornarItemPorId(UUID id) throws ArrayVaziaException, ElementoInexistenteException {
+		return ((RepositorioLooks) repositorio).RetornarLookPorId(id);
+    }
+}

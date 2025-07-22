@@ -1,0 +1,74 @@
+package repositorios;
+
+import java.util.ArrayList;
+
+import erros.*;
+
+
+
+public abstract class RepositorioBase <T> {
+	protected ArrayList <T> elementos;
+	private final int tamanhoMax;
+	
+	public RepositorioBase() {
+		this(50);
+	}
+	
+	public RepositorioBase(int tamMax) {
+		tamanhoMax = tamMax;
+		elementos = new ArrayList <T>();
+	}
+	
+	// getters
+	public int getTamanho() { return elementos.size(); }
+	public ArrayList<T> getTodos() throws ArrayVaziaException {
+		if(elementos.size() == 0) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		return elementos; 
+	}
+
+	public void inserirElemento(T novo) throws ArrayCheiaException, ElementoExistenteException {
+		if (elementos.size() == tamanhoMax) {
+			throw new ArrayCheiaException("Array está cheia");			
+		}
+		for(T elemento : elementos) {
+			if(elemento.equals(novo)) {
+				throw new ElementoExistenteException("Elemento já existente");
+			}
+		}
+		elementos.add(novo);
+	}
+	
+	public T retornarElemento(T item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (elementos.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		
+		for(int i = 0; i < elementos.size(); ++i) {
+			if (elementos.get(i).equals(item)) {
+				return elementos.get(i);
+			}
+		}
+		throw new ElementoInexistenteException("ELemento inexistente");		
+	}
+	
+	// talvez trocar por UUID
+	public void removerElemento(T item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (elementos.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		boolean remocao = false;
+		
+		for(int i = 0; i < elementos.size(); ++i) {
+			if (elementos.get(i).equals(item)) {
+				elementos.remove(i);
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			throw new ElementoInexistenteException("Elemento inexistente");		
+		}
+	}
+}

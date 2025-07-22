@@ -1,0 +1,21 @@
+package repositorios;
+
+import itens.ILavavel;
+
+
+public class RepositorioLavagem extends RepositorioBase <ILavavel>{
+	
+	public RepositorioLavagem()  {
+		super();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		super(tamMax);
+	}
+	
+	public void realizarLavagem() {
+		while(!elementos.isEmpty()) {
+			
+		}
+	}
+}

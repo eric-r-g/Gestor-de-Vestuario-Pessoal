@@ -1,0 +1,10 @@
+package itens;
+
+import java.time.LocalDate;
+
+public interface ILavavel {
+	public void AdicionarLavagem(LocalDate data);
+	public void ResetarLavagem();
+	public UUID getQuantidadeLavagens();
+	public LocalDate getUltimaLavagem();
+}

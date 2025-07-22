@@ -1,0 +1,61 @@
+package itens;
+
+import erros.ArrayCheiaException;
+import erros.ArrayVaziaException;
+import erros.ElementoExistenteException;
+import erros.ElementoInexistenteException;
+
+import java.util.ArrayList;
+
+public class RepositorioItem {
+	private ArrayList <Item> itens;
+	private final int tamanhoMax;
+	
+	public RepositorioItem() {
+		tamanhoMax = 100;
+		itens = new ArrayList <Item>();
+	}
+	
+	public RepositorioItem(int tamMax) {
+		tamanhoMax = tamMax;
+		itens = new ArrayList <Item>();
+	}
+	
+	public int getTamanho() { return itens.size(); }
+	public ArrayList<Item> getItens() {
+		if(itens.size() == 0) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		return itens; 
+	}
+
+	public void inserirItem(Item novo) throws ArrayCheiaException, ElementoExistenteException {
+		if (itens.size() == tamanhoMax) {
+			throw new ArrayCheiaException("Array está vazia");			
+		}
+		for(Item item : itens) {
+			if(item.equals(novo)) {
+				throw new ElementoExistenteException("Elemento já existente");
+			}
+		}
+		itens.add(novo);
+	}
+	
+	public void removerItem(Item item) throws ElementoInexistenteException, ArrayVaziaException {
+		if (itens.size() == 0) {
+			throw new ElementoInexistenteException("Array está vazia");	
+		}
+		boolean remocao = false;
+		
+		for(int i = 0; i < itens.size(); ++i) {
+			if (itens.get(i).equals(item)) {
+				itens.remove(i);
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			throw new ElementoInexistenteException("Item inexistente");		
+		}
+	}
+}

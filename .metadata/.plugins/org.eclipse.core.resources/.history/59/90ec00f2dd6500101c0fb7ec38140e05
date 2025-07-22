@@ -1,0 +1,52 @@
+package managers;
+
+import java.util.ArrayList;
+import repositorios.RepositorioBase;
+import erros.*;
+
+public abstract class ManagerBase <T> {
+    protected RepositorioBase<T> repositorio;
+    
+    protected ManagerBase(RepositorioBase<T> repositorio) {
+        this.repositorio = repositorio;
+    }
+    
+    public int tamanhoRepositorio() { 
+        return repositorio.getTamanho(); 
+    }
+    
+    public ArrayList<T> listarTodos() throws ArrayVaziaException {
+        try {
+            return repositorio.getTodos();
+        } catch (ArrayVaziaException e) {
+            throw e;
+        }
+    }
+    
+    public void adicionar(T item) throws ArrayCheiaException, ElementoExistenteException {
+        try {
+            repositorio.inserirElemento(item);
+        } catch (ArrayCheiaException | ElementoExistenteException e) {
+            throw e;
+        }
+    }
+    
+    public void remover(T item) throws ElementoInexistenteException, ArrayVaziaException {
+        try {
+            repositorio.removerElemento(item);
+        } catch (ElementoInexistenteException | ArrayVaziaException e) {
+            throw e;
+        }
+    }
+    
+    public void atualizar(T antigo, T novo) throws ElementoInexistenteException, ArrayVaziaException, ElementoExistenteException {
+        try {
+            repositorio.atualizarElemento(antigo, novo);
+        } catch (ElementoInexistenteException | ArrayVaziaException | ElementoExistenteException e) {
+            throw e;
+        }
+    }
+    
+    public abstract void atualizarBD();
+    public abstract void inicializarDados();
+}

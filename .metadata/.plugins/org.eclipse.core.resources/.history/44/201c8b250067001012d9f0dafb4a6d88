@@ -1,0 +1,91 @@
+package managers;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import erros.*;
+import itens.IEmprestavel;
+import itens.Item;
+import repositorios.RepositorioEmprestimo;
+
+public class EmprestimoManager extends ManagerBase <IEmprestavel> {
+	 private BDManager bdManager;
+	 private ItemManager itemManager;
+	 
+	 public EmprestimoManager(BDManager bdManager, ItemManager itemManager) {
+		 super(new RepositorioEmprestimo(100));
+		 this.bdManager = bdManager;
+		 this.itemManager = itemManager;
+
+		 inicializarDados();
+	 }
+	 
+	 public int tamanhoRepositorio() { return repositorio.getTamanho(); }
+	 public ArrayList <IEmprestavel> getEmprestimos() throws ArrayVaziaException {
+		 try {
+			 return repositorio.getTodos();
+		 } catch (ArrayVaziaException e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void atualizarBD() {
+		// ToDo: fazer a função
+	 }
+	 public void inicializarDados() {
+		 try {
+			 ResultSet rs = bdManager.listarEmprestavel();
+			 while(rs.next()){
+				try {
+					String id = rs.getString("id");
+					Item item = itemManager.retornarItemPorId(UUID.fromString(id));
+					
+					String data =
+					
+				} catch (ElementoInexistenteException | ArrayVaziaException e) {
+					System.out.print("erro EmprestM:" + e);
+					continue;
+				}
+			 }
+		 } catch (SQLException e) {
+			 System.out.print(e);
+		 }
+	 }
+	 
+	 public void novoEmprestimo(IEmprestavel item, String nome, int ano, Month mes, int dia) throws ArrayCheiaException, ElementoExistenteException, EmprestimoException {
+		 try {
+			 LocalDate data = LocalDate.of(ano, mes, dia);
+			 item.registrarEmprestimo(data, nome);
+			 repositorio.inserirElemento(item);
+		 } catch (Exception e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void novoEmprestimo(IEmprestavel item, String nome, LocalDate data) throws ArrayCheiaException, ElementoExistenteException, EmprestimoException {
+		 try {
+			 item.registrarEmprestimo(data, nome);
+			 repositorio.inserirElemento(item);
+		 } catch (Exception e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void terminarEmprestimo(IEmprestavel item) throws ElementoInexistenteException, ArrayVaziaException, EmprestimoException{
+		 remover(item);
+		 item.registrarDevolucao();
+	 }
+	 
+	 public long diasDeEmprestimo(IEmprestavel item) throws EmprestimoException {
+		 return item.quantidadeDeDiasDesdeOEmprestimo();
+	 }
+	 
+	public IEmprestavel retornarEmprestavelPorId(UUID id) throws ArrayVaziaException, ElementoInexistenteException {
+		return ((RepositorioEmprestimo) repositorio).RetornarEmprestavelPorId(id);
+	}
+		
+}

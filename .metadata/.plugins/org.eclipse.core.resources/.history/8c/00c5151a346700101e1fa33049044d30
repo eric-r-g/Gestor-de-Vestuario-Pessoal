@@ -1,0 +1,95 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+
+import erros.ArrayVaziaException;
+
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import itens.Look;
+import managers.BDManager;
+import managers.LookManager;
+import recursosGrafico.ModeloJanelaListar;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+public class JanelaLookListar extends ModeloJanelaListar <Look> {
+	private static final long serialVersionUID = 1L;
+	private LookManager lookManager;
+	private BDManager bdManager;
+	
+	public JanelaLookListar(GerenciadorPaginas gerenciador, LookManager lookManager, BDManager bdManager) {	
+		super(gerenciador, "Listagens Looks", "TELA_LOOKS_ADICIONAR");
+		this.lookManager = lookManager;
+		this.bdManager = bdManager;
+		
+		atualizarListagem();
+	}
+	
+	protected ArrayList<Look> obterListagem() throws ArrayVaziaException {
+		return lookManager.listarTodos();
+	}
+
+	
+	protected JPanel obterPainelItem(Look look) {
+		JPanel lookPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        if (look.getAcessorio() != null) {
+        	lookPanel.add(new JLabel("Acessorio:" + look.getAcessorio().getModelo()));
+        }
+        if (look.getSuperior() != null) {
+        	lookPanel.add(new JLabel("Parte Superior:" + look.getSuperior().getModelo()));
+        }
+        if (look.getCalcado() != null) {
+        	lookPanel.add(new JLabel("Calcado:" + look.getCalcado().getModelo()));
+        }
+        if (look.getInferior() != null) {
+        	lookPanel.add(new JLabel("Parte inferior:" + look.getInferior().getModelo()));
+        }
+        if (look.getUnica() != null) {
+        	lookPanel.add(new JLabel("Parte Unica:" + look.getUnica().getModelo()));
+        }
+        
+        lookPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        lookPanel.setMaximumSize(new Dimension(800, 40));
+        
+        JButton butaoDelete = new JButton("Deletar");
+        butaoDelete.putClientProperty("id", look.getId());
+        
+        butaoDelete.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		UUID id = (UUID) butaoDelete.getClientProperty("id");
+        		try {
+        			Look removido = lookManager.RetornarItemPorId(id);
+        			lookManager.remover(removido);
+        			bdManager.removerLook(removido);
+        		} catch (Exception erro) {
+        			System.out.print(erro);
+        		}
+        		atualizarListagem();
+            }
+        });
+        lookPanel.add(butaoDelete);
+        
+        JButton butaoEditar = new JButton("Editar");
+        butaoEditar.putClientProperty("id", look.getId());
+        
+        butaoEditar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		UUID id = (UUID) butaoEditar.getClientProperty("id");
+        		try {
+        			gerenciador.mostrarTela("TELA_LOOKS_ADICIONAR");
+        			gerenciador.JLAdd.setItemEditar(id);
+        		} catch (Exception erro) {
+        			System.out.print(erro);
+        		}
+        		atualizarListagem();
+            }
+        });
+        lookPanel.add(butaoEditar);
+        
+        return lookPanel;
+	}
+}

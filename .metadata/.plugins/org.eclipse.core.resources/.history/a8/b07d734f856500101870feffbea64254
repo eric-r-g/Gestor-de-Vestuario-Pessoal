@@ -1,0 +1,41 @@
+package managers;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.util.ArrayList;
+
+import erros.ArrayVaziaException;
+import itens.IEmprestavel;
+import itens.Item;
+import repositorios.RepositorioEmprestimo;
+
+public class EmprestimoManager {
+	 private RepositorioEmprestimo repositorio;
+	 
+	 public EmprestimoManager() {
+		 repositorio = new RepositorioEmprestimo(100);
+	 }
+	 
+	 public int tamanhoRepositorio() { return repositorio.getTamanho(); }
+	 public ArrayList <Item> getEmprestimos() throws ArrayVaziaException{
+		 try {
+			 return repositorio.getEmprestimos();
+		 } catch (ArrayVaziaException e) {
+			 throw e;
+		 }
+	 }
+	 
+	 public void atualizarBD() {
+		// ToDo: fazer a função
+	 }
+	 public void inicializarDados() {
+		// ToDO: fazer a função
+	 }
+	 
+	 public void novoEmprestimo(IEmprestavel item, int dia, Month mes, Year ano) {
+		 try {
+			 LocalDate data = new LocalDate(ano, mes, dia);
+		 }
+	 }
+}

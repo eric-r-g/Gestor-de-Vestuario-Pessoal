@@ -1,0 +1,10 @@
+package itens;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		RepositorioItem colecao = new RepositorioItem();
+
+	}
+
+}

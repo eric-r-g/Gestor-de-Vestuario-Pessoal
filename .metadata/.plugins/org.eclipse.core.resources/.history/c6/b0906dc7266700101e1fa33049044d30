@@ -1,0 +1,309 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+import java.util.UUID;
+
+import itens.Acessorio;
+import itens.Calcado;
+import itens.Item;
+import itens.Item.estadosConservacao;
+import itens.Item.tipoItem;
+import itens.PecaInferior;
+import itens.PecaSuperior;
+import itens.PecaUnica;
+import itens.RoupaIntima;
+import managers.ItemManager;
+import recursosGrafico.ModeloPagina;
+import erros.ArrayVaziaException;
+import erros.ElementoInexistenteException;
+import erros.EntradaInvalidaException;
+
+public class JanelaItensAdd extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+	private ItemManager itemManager;
+	private JComboBox <estadosConservacao> dropdownConservacao;
+	private JComboBox <tipoItem> dropdownTipo;
+	private JTextField formModelo;
+	private JTextField formLojaOrigem;
+	private JTextField formPreco;
+	private JTextField formTamanho;
+	private JTextField formMaterial;
+	private JTextField formNumeracao;
+	private JRadioButton botaoSim;
+	private JRadioButton botaoNao;
+	private JButton botaoSubmeter;
+	private JPanel painelFormulario;
+	private ButtonGroup formExterno;
+	protected UUID itemEditar;
+	
+	public JanelaItensAdd(GerenciadorPaginas gerenciador, ItemManager itemManager) {
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.itemManager = itemManager;
+		
+		configurarContentPane();
+	}
+	
+	public void setItemEditar(UUID itemId) {
+        this.itemEditar = itemId;
+        try {
+            modoEdicao();
+            botaoSubmeter.setText("Atualizar");
+        } catch (ArrayVaziaException | ElementoInexistenteException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+	
+	private String limparForm(Object entrada) {
+		return ((String) entrada).strip().toLowerCase();
+	}
+	
+	private void adicionarCampo(String label, Component campo) {
+		painelFormulario.add(new JLabel(label));
+		painelFormulario.add(campo);
+	}
+	
+	protected void atualizarFormulario(tipoItem tipo) {
+		painelFormulario.removeAll();
+		
+		painelFormulario.add(new JLabel("tipo"));
+		painelFormulario.add(dropdownTipo);
+		
+		painelFormulario.add(new JLabel("conservacao"));
+		painelFormulario.add(dropdownConservacao);
+		
+		painelFormulario.add(new JLabel("preco"));
+		painelFormulario.add(formPreco);
+		
+		painelFormulario.add(new JLabel("Modelo"));
+		painelFormulario.add(formModelo);
+		
+		painelFormulario.add(new JLabel("LojaOrigem"));
+		painelFormulario.add(formLojaOrigem);
+		//painelFormulario.add(formImagem);
+	
+		if(tipo != null) {
+			switch(tipo) {
+				case ACESSORIO -> {
+					adicionarCampo("Material:", formMaterial);
+				}
+				case CALCADO -> {
+					adicionarCampo("Numeração:", formNumeracao);
+				}
+				case SUPERIOR -> {
+					adicionarCampo("Tamanho", formTamanho);
+					painelFormulario.add(new JLabel("Externo:"));
+					painelFormulario.add(botaoSim);
+					painelFormulario.add(botaoNao);
+				}
+				case INFERIOR, UNICA, INTIMA -> {
+					adicionarCampo("Tamanho:", formTamanho);
+				}
+			}
+		}
+		
+		painelFormulario.add(botaoSubmeter);
+		
+    	painelFormulario.revalidate();	  
+    	painelFormulario.repaint();  
+	}
+	
+	protected void modoEdicao() throws ArrayVaziaException, ElementoInexistenteException {
+		Item item = itemManager.retornarItemPorId(itemEditar);
+		dropdownConservacao.setSelectedItem(item.getConservacao());
+		dropdownTipo.setSelectedItem(item.getTipo());
+		dropdownTipo.setEnabled(false);
+		formLojaOrigem.setText(item.getLojaOrigem());
+		formModelo.setText(item.getModelo());
+		formPreco.setText(Double.toString(item.getPreco()));
+		
+		switch(item.getTipo()) {
+			case "acessorio" -> {
+				formMaterial.setText(((Acessorio) item).getMaterial());
+			}
+			case "calcado" -> {
+				formNumeracao.setText(Integer.toString(((Calcado) item).getNumeracao()));
+			}
+			case "superior" -> {
+				formTamanho.setText(Integer.toString(((PecaSuperior) item).getTamanho()));
+				boolean isExterno = ((PecaSuperior) item).isExterno();
+	            
+	            if (formExterno != null) {
+	                formExterno.clearSelection();
+	                if (isExterno) {
+	                    botaoSim.setSelected(true);
+	                } else {
+	                    botaoNao.setSelected(true);
+	                }
+	            }
+			}
+			case "inferior" -> formTamanho.setText(Integer.toString(((PecaInferior) item).getTamanho()));
+			case "unica" -> formTamanho.setText(Integer.toString(((PecaUnica) item).getTamanho()));
+			case "intima" -> formTamanho.setText(Integer.toString(((RoupaIntima) item).getTamanho()));
+		}
+		
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Adicionar Item");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de voltar
+		JButton botaoVoltar = new JButton("voltar");
+		botaoVoltar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_ITENS_LISTAR");
+            }
+        });
+		painelSuperior.add(botaoVoltar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelFormulario = new JPanel();
+        painelFormulario.setBackground(Color.GRAY);
+        painelFormulario.setLayout(new BoxLayout(painelFormulario, BoxLayout.Y_AXIS)); // Layout vertical
+        painelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+        painelFormulario.setPreferredSize(new Dimension(800, 800));
+        painelFormulario.setMaximumSize(new Dimension(800, 800));
+		
+		// campo conservação
+		dropdownConservacao = new JComboBox<>(estadosConservacao.values());
+		dropdownConservacao.setMaximumSize(new Dimension(300, 30));
+		// campo modelo
+		formModelo = new JTextField();
+		formModelo.setPreferredSize(new Dimension(300, 30));
+		formModelo.setMaximumSize(new Dimension(300, 30));
+		
+		// campo loja
+		formLojaOrigem = new JTextField();
+		formLojaOrigem.setPreferredSize(new Dimension(300, 30));
+		formLojaOrigem.setMaximumSize(new Dimension(300, 30));
+		
+		// campo preco
+		formPreco = new JTextField();
+		formPreco.setPreferredSize(new Dimension(300, 30));
+		formPreco.setMaximumSize(new Dimension(300, 30));
+		
+		formTamanho = new JTextField();
+		formTamanho.setPreferredSize(new Dimension(300, 30));
+		formTamanho.setMaximumSize(new Dimension(300, 30));
+		
+		formMaterial = new JTextField();
+		formMaterial.setPreferredSize(new Dimension(300, 30));
+		formMaterial.setMaximumSize(new Dimension(300, 30));
+		
+		formNumeracao = new JTextField();
+		formNumeracao.setPreferredSize(new Dimension(300, 30));
+		formNumeracao.setMaximumSize(new Dimension(300, 30));		
+		formExterno = new ButtonGroup();
+		botaoSim = new JRadioButton("sim");
+		formExterno.add(botaoSim);
+		
+		botaoNao = new JRadioButton("não");		
+		formExterno.add(botaoNao);
+		
+		botaoSubmeter = new JButton("submeter");
+		botaoSubmeter.setPreferredSize(new Dimension(300, 30));
+		
+        // campo tipo
+		dropdownTipo = new JComboBox<>(tipoItem.values());
+		dropdownTipo.setMaximumSize(new Dimension(300, 30));
+		dropdownTipo.addItemListener(new ItemListener() {
+		    public void itemStateChanged(ItemEvent e) {
+		    	tipoItem tipo = (tipoItem) dropdownTipo.getSelectedItem();
+		    	
+		    	atualizarFormulario(tipo);
+		    }
+		});
+		
+		
+		botaoSubmeter.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			// talvez mudar a forma da logica
+        			tipoItem tipo = (tipoItem) dropdownTipo.getSelectedItem();
+	                estadosConservacao conservacao = (estadosConservacao) dropdownConservacao.getSelectedItem();
+	                String modelo = limparForm(formModelo.getText());
+	                String lojaOrigem = limparForm(formLojaOrigem.getText());
+	                Double preco = 0.0;
+	                
+	                try {
+	                	preco = Double.parseDouble(formPreco.getText());
+	                } catch (Exception erro) {
+	                	throw (new EntradaInvalidaException("Form do double não está valido"));
+	                }
+	                if (modelo.isBlank()) {
+	                	throw (new EntradaInvalidaException("Form do modelo está vazio"));
+	                }
+	                if (lojaOrigem.isBlank()) {
+	                	throw (new EntradaInvalidaException("Form da loja de origem está vazio"));
+	                }
+	                HashMap<String, String> extras = new HashMap<String, String>();
+	                // ToDO: entrada de imagens
+	                switch(tipo) {
+						case ACESSORIO -> {
+							String material = limparForm(formMaterial.getText());
+		                	if(material.isBlank()) {
+		                		throw (new EntradaInvalidaException("Form do material está vazio"));
+		                	}
+		                	extras.put("material", material);
+						}
+						case CALCADO -> {
+							String numeracao = limparForm(formNumeracao.getText());
+		                	if(numeracao.isBlank()) {
+		                		throw (new EntradaInvalidaException("Form do material está vazio"));
+		                	}
+		                	extras.put("numeracao", numeracao);
+						}	
+						case SUPERIOR -> {
+							String tamanho = limparForm(formTamanho.getText());
+		                	if(tamanho.isBlank()) {
+		                		throw (new EntradaInvalidaException("Form do tamanho está vazio"));
+		                	}
+		                	extras.put("tamanho", tamanho);
+		                	
+							boolean isExterno = botaoSim.isSelected();
+							if (isExterno) {
+								extras.put("externo", "yes");
+							} else {
+								extras.put("externo", "no");
+							}
+						}	
+						case INFERIOR, UNICA, INTIMA -> {
+							String tamanho = limparForm(formTamanho.getText());
+		                	if(tamanho.isBlank()) {
+		                		throw (new EntradaInvalidaException("Form do tamanho está vazio"));
+		                	}
+		                	extras.put("tamanho", tamanho);
+						}
+					}
+	                try {
+	                	itemManager.adicionarItemPorDados(tipo, modelo, lojaOrigem, conservacao, preco, extras);
+	                } catch (Exception erro) {
+	                	System.out.print(erro);
+	                }
+	                itemManager.atualizarBD();
+        		} catch (EntradaInvalidaException erro) {
+        			System.out.print(erro); 		
+        		}
+            }
+        });
+		
+		atualizarFormulario(tipoItem.ACESSORIO);
+		contentPane.add(painelSuperior);
+		contentPane.add(painelFormulario);
+	}
+}

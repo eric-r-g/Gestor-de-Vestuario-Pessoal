@@ -1,0 +1,125 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import itens.Look;
+import managers.BDManager;
+import managers.LookManager;
+import java.util.ArrayList;
+import java.util.UUID;
+
+public class JanelaLookListar extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+	private LookManager lookManager;
+	private BDManager bdManager;
+	private JPanel painelListagem;
+	
+	public JanelaLookListar(GerenciadorPaginas gerenciador, LookManager lookManager, BDManager bdManager) {	
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.lookManager = lookManager;
+		this.bdManager = bdManager;
+		
+		configurarContentPane();
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Listagens Itens");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de adicionar
+		JButton botaoAdicionar = new JButton("adicionar");
+		botaoAdicionar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_LOOKS_ADICIONAR");
+            }
+        });
+		painelSuperior.add(botaoAdicionar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelListagem = new JPanel();
+        painelListagem.setBackground(Color.GRAY);
+        painelListagem.setLayout(new BoxLayout(painelListagem, BoxLayout.Y_AXIS)); // Layout vertical
+        painelListagem.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		
+        // scroll 
+        JScrollPane painelScroll = new JScrollPane(painelListagem);
+        painelScroll.setPreferredSize(new Dimension(800, 800));
+        painelScroll.setMaximumSize(new Dimension(800, 800));
+        
+		contentPane.add(painelSuperior);
+		contentPane.add(painelScroll);
+		
+		atualizarListagem();
+	}
+	
+	public void atualizarListagem() {
+		painelListagem.removeAll();
+		try {
+			ArrayList <Look> lista = lookManager.listarTodos();
+			
+			if (lista != null) {
+				for(Look look : lista) { // mudanças quando tiver o repositorio
+		            JPanel itemPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		            if (look.getAcessorio() != null) {
+		            	itemPanel.add(new JLabel("Acessorio:" + look.getAcessorio().getModelo()));
+		            }
+		            if (look.getSuperior() != null) {
+		            	itemPanel.add(new JLabel("Parte Superior:" + look.getSuperior().getModelo()));
+		            }
+		            if (look.getCalcado() != null) {
+		            	itemPanel.add(new JLabel("Calcado:" + look.getCalcado().getModelo()));
+		            }
+		            if (look.getInferior() != null) {
+		            	itemPanel.add(new JLabel("Parte inferior:" + look.getInferior().getModelo()));
+		            }
+		            if (look.getUnica() != null) {
+		            	itemPanel.add(new JLabel("Parte Unica:" + look.getUnica().getModelo()));
+		            }
+		            
+		            itemPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+		            itemPanel.setMaximumSize(new Dimension(800, 40));
+		            
+		            JButton butaoDelete = new JButton("Deletar");
+		            butaoDelete.putClientProperty("id", look.getId());
+		            
+		            butaoDelete.addMouseListener(new MouseAdapter() {
+		            	public void mouseClicked(MouseEvent e) {
+		            		UUID id = (UUID) butaoDelete.getClientProperty("id");
+		            		try {
+		            			Look removido = lookManager.RetornarItemPorId(id);
+		            			itemManager.remover(removido);
+		            			bdManager.removerItem(removido);
+		            		} catch (Exception erro) {
+		            			System.out.print(erro);
+		            		}
+		            		atualizarListagem();
+		            		
+		            		
+		                }
+		            });
+		            itemPanel.add(butaoDelete);
+		            painelListagem.add(itemPanel);
+		            painelListagem.add(Box.createVerticalStrut(5)); 
+		        }
+			}
+		} catch (Exception e) {
+			// ToDo: tratamento de erro
+		}
+		
+	}
+}

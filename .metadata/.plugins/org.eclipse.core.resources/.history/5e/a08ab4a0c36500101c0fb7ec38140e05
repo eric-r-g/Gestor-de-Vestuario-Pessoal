@@ -1,0 +1,17 @@
+package repositorios;
+
+import itens.ILavavel;
+
+
+public class RepositorioLavagem extends RepositorioBase <ILavavel>{
+	
+	public RepositorioLavagem()  {
+		super();
+	}
+	
+	public RepositorioLavagem(int tamMax) {
+		super(tamMax);
+	}
+	
+	// ToDo: será a lavagem;
+}

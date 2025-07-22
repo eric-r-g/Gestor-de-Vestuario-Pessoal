@@ -1,0 +1,10 @@
+package interfaceGrafica;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		GerenciadorPaginas gerenciado = new GerenciadorPaginas();
+
+	}
+
+}

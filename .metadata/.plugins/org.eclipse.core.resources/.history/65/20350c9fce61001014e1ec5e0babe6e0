@@ -1,0 +1,36 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class BulletPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
+	
+	
+	private JLabel bullet;
+	private JLabel text;
+	private Font fontePadrao = new Font("Arial", Font.PLAIN, 24);
+	
+	public BulletPanel(String secao) {
+		setLayout(new BorderLayout(5, 5));
+		setBorder(BorderFactory.createLineBorder(Color.RED));
+		setPreferredSize(new Dimension(200, 30));
+		setMaximumSize(new Dimension(200,10));
+		
+		bullet = new JLabel("•");
+        bullet.setForeground(Color.WHITE);
+        bullet.setFont(fontePadrao);
+        
+        // Criar a label de texto
+        text = new JLabel(secao);
+        text.setForeground(Color.WHITE);
+        text.setFont(fontePadrao);
+        
+        setBackground(Color.black);
+        
+        add(bullet, BorderLayout.WEST);
+        add(text, BorderLayout.CENTER);
+        
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	}
+}

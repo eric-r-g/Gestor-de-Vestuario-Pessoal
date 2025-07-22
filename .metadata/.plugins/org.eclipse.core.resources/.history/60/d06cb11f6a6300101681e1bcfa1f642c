@@ -1,0 +1,37 @@
+package itens;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+public class PecaInferior extends Item implements IEmprestavel {
+	private LocalDate dataDeEmprestimo;
+	
+	public PecaInferior(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco) {
+		super(modelo, lojaOrigem, conservacao, preco);
+		dataDeEmprestimo = null;
+	}
+	
+	
+	// metodos para emprestimo
+	public void registrarEmprestimo(LocalDate data) {
+		if (!dataDeEmprestimo.equals(null)) {
+			// lança erro pois já está emprestado
+		}
+		dataDeEmprestimo = data;
+	}
+	
+	public long quantidadeDeDiasDesdeOEmprestimo() {
+		if (dataDeEmprestimo.equals(null)) {
+			// lança erro pois não está emprestado
+		}
+		return ChronoUnit.DAYS.between(LocalDate.now(), dataDeEmprestimo);
+		
+	}
+	
+	public void registrarDevolucao() {
+		if (dataDeEmprestimo.equals(null)) {
+			// lança erro pois não está emprestado
+		}
+		dataDeEmprestimo = null;
+	}
+}

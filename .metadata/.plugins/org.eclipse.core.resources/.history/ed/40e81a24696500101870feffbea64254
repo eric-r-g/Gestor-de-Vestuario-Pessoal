@@ -1,0 +1,79 @@
+package interfaceGrafica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import itens.Item;
+import managers.ItemManager;
+import java.util.ArrayList;
+
+public class JanelaItensListar extends ModeloPagina{
+	private static final long serialVersionUID = 1L;
+	private GerenciadorPaginas gerenciador;
+	private ItemManager itemManager;
+	private JPanel painelListagem;
+	
+	public JanelaItensListar(GerenciadorPaginas gerenciador, ItemManager itemManager) {	
+		super(gerenciador);
+		this.gerenciador = gerenciador;
+		this.itemManager = itemManager;
+		
+		configurarContentPane();
+	}
+	
+	protected void configurarContentPane() {
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		contentPane.setBackground(Color.WHITE);
+		
+		// painel superior
+		JPanel painelSuperior = new JPanel(new BorderLayout());
+		painelSuperior.setBorder(BorderFactory.createEmptyBorder(50, 40, 100, 40));
+		painelSuperior.setBackground(Color.WHITE);
+		
+		// titulo
+		JLabel labelTitulo = new JLabel("Listagens Itens");
+		labelTitulo.setFont(new Font("Arial", Font.PLAIN, 24));
+		painelSuperior.add(labelTitulo, BorderLayout.WEST);
+		
+		// botão de adicionar
+		JButton botaoAdicionar = new JButton("adicionar");
+		botaoAdicionar.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela("TELA_ITENS_ADICIONAR");
+            }
+        });
+		painelSuperior.add(botaoAdicionar, BorderLayout.EAST);
+		
+		// painel listagem 
+		painelListagem = new JPanel();
+        painelListagem.setBackground(Color.GRAY);
+        painelListagem.setLayout(new BoxLayout(painelListagem, BoxLayout.Y_AXIS)); // Layout vertical
+        painelListagem.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		
+        // scroll 
+        JScrollPane painelScroll = new JScrollPane(painelListagem);
+        painelScroll.setPreferredSize(new Dimension(800, 800));
+        painelScroll.setMaximumSize(new Dimension(800, 800));
+        
+		contentPane.add(painelSuperior);
+		contentPane.add(painelScroll);
+		
+		atualizarListagem();
+	}
+	
+	public void atualizarListagem() {
+		painelListagem.removeAll();
+		ArrayList <Item> lista = itemManager.listarItens();
+		for(Item item : lista) { // mudanças quando tiver o repositorio
+            JPanel itemPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            itemPanel.add(new JLabel(item.getTipo()));
+            itemPanel.add(new JLabel(item.getModelo()));
+            itemPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            itemPanel.setMaximumSize(new Dimension(800, 40));
+            painelListagem.add(itemPanel);
+            painelListagem.add(Box.createVerticalStrut(5)); 
+        }
+	}
+}

@@ -1,0 +1,12 @@
+package managers;
+
+import itens.ILavavel;
+
+public class LavagemManager extends ManagerBase<ILavavel>{
+	public void atualizarBD() {
+    	
+    }
+    public void inicializarDados() {
+    	
+    }
+}

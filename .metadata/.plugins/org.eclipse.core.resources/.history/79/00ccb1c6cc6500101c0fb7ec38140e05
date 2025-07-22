@@ -1,0 +1,62 @@
+package itens;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Look {
+	private final UUID id;
+	private PecaSuperior superior;
+	private PecaInferior inferior;
+	private PecaUnica unica;
+	private Calcado calcado;
+	private Acessorio acessorio;
+	private Queue <utilizacao> utilizacoes;
+	
+	public Look (PecaSuperior superior, PecaInferior inferior, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.inferior = inferior;
+		this.superior = superior;
+		this.calcado = calcado;
+		this.utilizacoes = new LinkedList <utilizacao>();
+	}
+	
+	public Look (PecaUnica unica, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.unica = unica;
+		this.calcado = calcado;
+	}
+	
+	public static class utilizacao {
+        private LocalDate data;
+        private String local;
+        
+        public utilizacao(LocalDate data, String local) {
+            this.data = data;
+            this.local = local;
+        }
+        
+        public LocalDate getData() { return data; }
+        public String getLocal() { return local; }
+        
+        public String toString() { return "(" + local + ", " + data + ")"; }
+    }
+	
+	
+	//getters
+	public PecaSuperior getSuperior() { return superior; }
+	public PecaInferior getInferior() { return inferior; }
+	public UUID getId() { return id; }
+	public PecaUnica getUnica() { return unica; }
+	public Calcado getCalcado() { return calcado; }
+	public Acessorio getAcessorio() { return acessorio; }
+	
+	//setters
+	public void setUnica(PecaUnica unica) { this.unica = unica; }
+	public void setCalcado(Calcado calcado) { this.calcado = calcado; }
+	public void setSuperior(PecaSuperior superior) { this.superior = superior; }
+	public void setInferior(PecaInferior inferior) { this.inferior = inferior; }
+	public void setInferior(Acessorio acessorio) { this.acessorio = acessorio; }
+}

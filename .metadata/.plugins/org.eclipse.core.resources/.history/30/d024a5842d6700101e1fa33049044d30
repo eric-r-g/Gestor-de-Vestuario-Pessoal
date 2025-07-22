@@ -1,0 +1,170 @@
+package managers;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
+
+import erros.*;
+import itens.Item.*;
+import repositorios.RepositorioItem;
+import itens.*;
+
+public class ItemManager extends ManagerBase <Item> {
+	private BDManager bdManager;
+	
+	public ItemManager(BDManager bdManager) {
+		super(new RepositorioItem());
+		this.bdManager = bdManager;
+		inicializarDados();
+	}
+	
+	
+	public void atualizarBD() {
+		try {
+			ArrayList <Item> lista = listarTodos();
+			for(Item item : lista) {
+				try {
+					bdManager.inserirItem(item);
+				} catch (SQLException e) {
+					System.out.print(e);
+				}
+			}
+		} catch (ArrayVaziaException e) {
+			System.out.print(e);
+		} 
+	}
+	
+	public void inicializarDados()  {
+		try {
+			ResultSet rs = bdManager.listarItens();
+			while(rs.next()) {
+				try {
+					UUID id = UUID.fromString(rs.getString("id"));
+					tipoItem tipo = tipoItem.fromString(rs.getString("tipo"));
+					String modelo = rs.getString("modelo");
+					String lojaOrigem = rs.getString("loja_origem");
+					estadosConservacao conservacao = estadosConservacao.fromString(rs.getString("estado_conservacao"));
+					double preco = rs.getDouble("preco");
+					
+					HashMap <String, String> extras = new HashMap<String, String>();
+					
+					switch (tipo) {
+						case INFERIOR -> extras.put("tamanho", Integer.toString(rs.getInt("tamanho")));
+						case UNICA -> extras.put("tamanho", Integer.toString(rs.getInt("tamanho")));						
+						case SUPERIOR -> {
+							extras.put("tamanho", Integer.toString(rs.getInt("tamanho")));
+							if(rs.getBoolean("externo")) {
+								extras.put("externo","yes");
+							} else {
+								extras.put("externo","no");
+							}
+						}
+						case CALCADO -> extras.put("numeracao", Integer.toString(rs.getInt("numeracao")));
+						case INTIMA -> extras.put("tamanho", Integer.toString(rs.getInt("tamanho")));
+						case ACESSORIO -> extras.put("material", rs.getString("material"));
+						default -> throw new EntradaInvalidaException("Tipo invalido");
+					}
+					adicionarItemPorDados(id, tipo, modelo, lojaOrigem, conservacao, preco, extras);
+				} catch (Exception e) {
+					System.out.print(e);
+				}
+			}
+		} catch (SQLException e) {
+			System.out.print(e);
+		}
+	}
+	
+	public Item criarItem(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException {
+		Item novo = null;
+		try {
+			novo = switch (tipo) {
+				case INFERIOR -> new PecaInferior(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case UNICA -> new PecaUnica(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case SUPERIOR -> new PecaSuperior(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")), Boolean.valueOf(extras.get("externo")));
+				case CALCADO -> new Calcado(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("numeracao")));
+				case INTIMA -> new RoupaIntima(modelo, lojaOrigem, conservacao, preco, Integer.valueOf(extras.get("tamanho")));
+				case ACESSORIO -> new Acessorio(modelo, lojaOrigem, conservacao, preco, extras.get("material"));
+				default -> throw new EntradaInvalidaException("Tipo invalido");
+			};
+		} catch (Exception e) {
+			throw new EntradaInvalidaException("Argumentação invalida" + e.toString());
+		}
+		
+		return novo;
+	}
+	
+	public Item criarItem(UUID id, tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException {
+		Item retorno = criarItem(tipo, modelo, lojaOrigem, conservacao, preco, extras);
+		retorno.setId(id);
+		return retorno;
+	}
+	
+	public void adicionarItemPorDados(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException, ArrayCheiaException, ElementoExistenteException {
+		Item novo = criarItem(tipo, modelo, lojaOrigem, conservacao, preco, extras);		
+		adicionar(novo);
+	}
+	
+	public void adicionarItemPorDados(UUID id, tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras) throws EntradaInvalidaException, ArrayCheiaException, ElementoExistenteException {
+		Item novo = criarItem(id, tipo, modelo, lojaOrigem, conservacao, preco, extras);		
+		adicionar(novo);
+	}
+	
+	public void atualizarItem(tipoItem tipo, String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, HashMap <String, String> extras, Item antigo) throws EntradaInvalidaException, ElementoInexistenteException, ArrayVaziaException, ElementoExistenteException, SQLException {
+		Item novo = criarItem(tipo, modelo, lojaOrigem, conservacao, preco, extras);
+		atualizar(antigo, novo);
+	}
+	
+	public Item retornarItemPorId(UUID id) throws ArrayVaziaException, ElementoInexistenteException {
+		return ((RepositorioItem) repositorio).RetornarItemPorId(id);
+	}
+	
+	public ArrayList<Item> listarPorTipo(String tipo) throws ArrayVaziaException {
+		ArrayList<Item> itens_tipo = new ArrayList<Item>();
+		ArrayList<Item> itens = listarTodos();
+		for(Item item : itens) {
+			if(item.getTipo().equals(tipo)) {
+				itens_tipo.add(item);
+			}
+		}
+		
+		if (itens_tipo.size() == 0) {
+			throw new ArrayVaziaException("não há itens desse tipo");
+		}
+		
+		return itens_tipo;
+	}
+
+	public ArrayList<Item> listarEmprestaveis() throws ArrayVaziaException {
+		ArrayList<Item> itens_tipo = new ArrayList<Item>();
+		ArrayList<Item> itens = listarTodos();
+		for(Item item : itens) {
+			if(item instanceof IEmprestavel) {
+				itens_tipo.add(item);
+			}
+		}
+		
+		if (itens_tipo.size() == 0) {
+			throw new ArrayVaziaException("não há itens desse tipo");
+		}
+		
+		return itens_tipo;
+	}
+	
+	public ArrayList<Item> listarLavaveis() throws ArrayVaziaException {
+		ArrayList<Item> itens_tipo = new ArrayList<Item>();
+		ArrayList<Item> itens = listarTodos();
+		for(Item item : itens) {
+			if(item instanceof ILavavel) {
+				itens_tipo.add(item);
+			}
+		}
+		
+		if (itens_tipo.size() == 0) {
+			throw new ArrayVaziaException("não há itens desse tipo");
+		}
+		
+		return itens_tipo;
+	}
+}

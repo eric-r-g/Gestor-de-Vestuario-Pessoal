@@ -1,0 +1,28 @@
+package repositorios;
+
+import java.time.LocalDate;
+
+import erros.*;
+import itens.Look;
+
+public class RepositorioLooks extends RepositorioBase <Look> {
+	public RepositorioLooks() {
+		super();
+	}
+	
+	public RepositorioLooks(int tamMax) {
+		super(tamMax);
+	}
+	
+	public void utilizarLook(Look look, String local, LocalDate data) throws ElementoInexistenteException, ArrayVaziaException {
+		if (elementos.isEmpty()) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		int index = elementos.indexOf(look);
+		
+        if (index == -1) {
+            throw new ElementoInexistenteException("Elemento inexistente");
+        }
+        look.adicionarUtilizacao(data, local);
+	}
+}

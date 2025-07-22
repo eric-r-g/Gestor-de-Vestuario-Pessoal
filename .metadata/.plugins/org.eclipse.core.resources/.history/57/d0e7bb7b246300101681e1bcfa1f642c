@@ -1,0 +1,14 @@
+package interfaceGrafica;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		ModeloPagina frame = new JanelaItensAdd ("Titulo da Aplicacao");
+		ModeloPagina frame2 = new JanelaItensListar ("Titulo");
+
+        
+        frame.setVisible(true);
+        frame2.setVisible(true);
+	}
+
+}

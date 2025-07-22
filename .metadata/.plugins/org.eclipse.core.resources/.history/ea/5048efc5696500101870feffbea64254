@@ -1,0 +1,40 @@
+package managers;
+
+import java.util.Vector;
+
+import interfaceGrafica.ILavavel;
+
+public class RepositorioLavagem {
+	private Vector <ILavavel> lavanderia;
+	private final int tamanhoMax;
+	
+	public RepositorioLavagem() {
+		lavanderia = new Vector<>();
+		tamanhoMax = 40;
+	}
+	
+	public void inserirLavanderia(ILavavel item) {
+		if (lavanderia.size() == tamanhoMax) {
+			// subir erro de tamanho maximo alcançado
+		}
+		lavanderia.add(item);
+	}
+	
+	public void removerLavanderia(ILavavel item) {
+		if (lavanderia.size() == 0) {
+			// subir erro de impossivel de remover
+		}
+		boolean remocao = false;
+		for(int i = 0; i < lavanderia.size(); ++i) {
+			if (lavanderia.get(i).equals(item)) {
+				lavanderia.remove(i);
+				remocao = true;
+				break;
+			}
+		}
+		
+		if(!remocao) {
+			//subir erro de item não está na lavagem
+		}
+	}
+}

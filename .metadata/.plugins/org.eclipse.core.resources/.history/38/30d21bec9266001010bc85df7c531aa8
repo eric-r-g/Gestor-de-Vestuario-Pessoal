@@ -1,0 +1,5 @@
+package recursosGrafico;
+
+public abstract class ModeloJanelaListar {
+
+}

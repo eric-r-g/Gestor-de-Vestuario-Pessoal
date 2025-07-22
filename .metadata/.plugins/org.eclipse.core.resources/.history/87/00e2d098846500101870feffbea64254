@@ -1,0 +1,23 @@
+package managers;
+
+import java.util.ArrayList;
+
+import erros.ArrayVaziaException;
+import itens.Item;
+import repositorios.RepositorioEmprestimo;
+
+public class EmprestimoManager {
+	 private RepositorioEmprestimo repositorio;
+	 
+	 public EmprestimoManager() {
+		 repositorio = new RepositorioEmprestimo(100);
+	 }
+	 
+	 public ArrayList <Item> getEmprestimos() throws ArrayVaziaException{
+		 try {
+			 return repositorio.getEmprestimos();
+		 } catch (ArrayVaziaException e) {
+			 throw e;
+		 }
+	 }
+}

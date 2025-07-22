@@ -1,0 +1,13 @@
+package interfaceGrafica;
+
+public class Teste {
+
+	public static void main(String[] args) {
+		GerenciadorPaginas gerenciado = new Gerenciador();
+
+        
+        frame.setVisible(true);
+        frame2.setVisible(true);
+	}
+
+}

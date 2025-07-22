@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="interfaceGrafica.BulletPanel"/>
+    <fullyQualifiedTypeName name="java.util.Vector"/>
+    <fullyQualifiedTypeName name="java.util.GregorianCalendar"/>
+    <fullyQualifiedTypeName name="java.time.temporal.ChronoUnit"/>
+    <fullyQualifiedTypeName name="lavagem.ILavavel"/>
+    <fullyQualifiedTypeName name="managers.ItemManager"/>
+    <fullyQualifiedTypeName name="itens.RepositorioItem"/>
+    <fullyQualifiedTypeName name="erros.EntradaInvalidaException"/>
+    <fullyQualifiedTypeName name="itens.Item.tipoItem"/>
+    <fullyQualifiedTypeName name="itens.Item"/>
+    <fullyQualifiedTypeName name="repositorios.RepositorioEmprestimo"/>
+    <fullyQualifiedTypeName name="itens.ILavavel"/>
+    <fullyQualifiedTypeName name="repositorios.RepositorioLooks"/>
+    <fullyQualifiedTypeName name="itens.Item.estadosConservacao"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="interfaceGrafica.JanelaLookAdd.ComboItem"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="interfaceGrafica.GerenciadorPaginas"/>
+    <fullyQualifiedTypeName name="java.time.LocalDate"/>
+</qualifiedTypeNameHistroy>

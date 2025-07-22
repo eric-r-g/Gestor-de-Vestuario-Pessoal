@@ -1,0 +1,44 @@
+package repositorios;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+import erros.*;
+import itens.Look;
+import itens.item;
+
+public class RepositorioLooks extends RepositorioBase <Look> {
+	public RepositorioLooks() {
+		super();
+	}
+	
+	public RepositorioLooks(int tamMax) {
+		super(tamMax);
+	}
+	
+	public void utilizarLook(Look look, String local, LocalDate data) throws ElementoInexistenteException, ArrayVaziaException {
+		if (elementos.isEmpty()) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		int index = elementos.indexOf(look);
+		
+        if (index == -1) {
+            throw new ElementoInexistenteException("Elemento inexistente");
+        }
+        
+        look.adicionarUtilizacao(data, local);
+	}
+	
+	public void atualizarElemento(Look look, ArrayList <Item> itens ) {
+		if (elementos.isEmpty()) {
+			throw new ArrayVaziaException("Array está vazia");
+		}
+		int index = elementos.indexOf(look);
+		
+        if (index == -1) {
+            throw new ElementoInexistenteException("Elemento inexistente");
+        }
+        
+        look.adicionarUtilizacao(data, local);
+	}
+}

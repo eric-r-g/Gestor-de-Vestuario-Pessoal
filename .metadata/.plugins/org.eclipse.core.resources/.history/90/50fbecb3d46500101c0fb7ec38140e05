@@ -1,0 +1,108 @@
+package itens;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import java.util.ArrayList;
+
+public class Look {
+	private final UUID id;
+	private PecaSuperior superior;
+	private PecaInferior inferior;
+	private PecaUnica unica;
+	private Calcado calcado;
+	private Acessorio acessorio;
+	private ArrayList <Utilizacao> utilizacoes;
+	
+	public Look (PecaSuperior superior, PecaInferior inferior, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.inferior = inferior;
+		this.superior = superior;
+		this.calcado = calcado;
+		this.utilizacoes = new ArrayList <Utilizacao>();
+	}
+	
+	public Look (PecaUnica unica, Calcado calcado) {
+		id = UUID.randomUUID();
+		this.unica = unica;
+		this.calcado = calcado;
+		this.utilizacoes = new ArrayList <Utilizacao>();
+	}
+	
+	public void atualizarLook (ArrayList <Item> itens) {
+		for(Item item : itens) {
+			switch(item.getTipo()) {
+				case "superior" -> atualizarLook((PecaSuperior) item);
+				case "inferior" -> atualizarLook((PecaInferior) item);
+				case "unica" -> atualizarLook((PecaUnica) item);
+				case "acessorio" -> atualizarLook((Acessorio) item);
+				case "calcado" -> atualizarLook((Calcado) item);
+			}
+		}
+	}
+	
+	public void atualizarLook (PecaSuperior superior) {
+		this.unica = null;
+		this.superior = superior;
+	}
+	
+	public void atualizarLook (PecaInferior inferior) {
+		this.unica = null;
+		this.inferior = inferior;
+	}
+	
+	public void atualizarLook (PecaUnica unica) {
+		this.superior = null;
+		this.inferior = null;
+		this.unica = unica;
+	}
+	
+	public void atualizarLook (Calcado calcado) {
+		
+	}
+	
+	public void atualizarLook (Acessorio acessorio) {
+		
+	}
+	
+	public static class Utilizacao {
+        private LocalDate data;
+        private String local;
+        
+        public Utilizacao(LocalDate data, String local) {
+            this.data = data;
+            this.local = local;
+        }
+        
+        public LocalDate getData() { return data; }
+        public String getLocal() { return local; }
+        
+        public String toString() { return "(" + local + ", " + data + ")"; }
+    }
+	
+	
+	//getters
+	public PecaSuperior getSuperior() { return superior; }
+	public PecaInferior getInferior() { return inferior; }
+	public UUID getId() { return id; }
+	public PecaUnica getUnica() { return unica; }
+	public Calcado getCalcado() { return calcado; }
+	public Acessorio getAcessorio() { return acessorio; }
+    public ArrayList <Utilizacao> getUtilizacoes(){ return utilizacoes;}
+
+	
+	//setters
+	public void setUnica(PecaUnica unica) { this.unica = unica; }
+	public void setCalcado(Calcado calcado) { this.calcado = calcado; }
+	public void setSuperior(PecaSuperior superior) { this.superior = superior; }
+	public void setInferior(PecaInferior inferior) { this.inferior = inferior; }
+	public void setInferior(Acessorio acessorio) { this.acessorio = acessorio; }
+	
+	public void adicionarUtilizacao(LocalDate data, String local) {
+		Utilizacao utilizacao = new Utilizacao(data, local);
+		utilizacoes.add(utilizacao);
+		if(utilizacoes.size() > 5) {
+			utilizacoes.removeFirst();
+		}
+	}
+}

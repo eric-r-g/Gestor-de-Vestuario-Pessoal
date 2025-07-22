@@ -1,0 +1,44 @@
+package recursosGrafico;
+
+import javax.swing.*;
+
+import interfaceGrafica.GerenciadorPaginas;
+
+import java.awt.*;
+import java.awt.event.*;
+
+public class BulletPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
+	
+	
+	private JLabel bullet;
+	private JLabel text;
+	private Font fontePadrao = new Font("Arial", Font.PLAIN, 24);
+	
+	public BulletPanel(String secao, String nomeTela, GerenciadorPaginas gerenciador) {
+		setLayout(new BorderLayout(5, 5));
+		setPreferredSize(new Dimension(200, 50));
+		
+		bullet = new JLabel("•");
+        bullet.setForeground(Color.WHITE);
+        bullet.setFont(fontePadrao);
+        
+        // Criar a label de texto
+        text = new JLabel(secao);
+        text.setForeground(Color.WHITE);
+        text.setFont(fontePadrao);
+        
+        setBackground(Color.black);
+        
+        add(bullet, BorderLayout.WEST);
+        add(text, BorderLayout.CENTER);
+        
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        
+        addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+                gerenciador.mostrarTela(nomeTela);
+            }
+        });
+	}
+}

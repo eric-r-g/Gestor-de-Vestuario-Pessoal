@@ -1,0 +1,32 @@
+package repositorios;
+
+import java.util.UUID;
+
+import erros.ArrayVaziaException;
+import erros.ElementoInexistenteException;
+import itens.Item;
+
+
+public class RepositorioItem extends RepositorioBase <Item>{
+	
+	public RepositorioItem() {
+		super();
+	}
+	
+	public RepositorioItem(int tamMax) {
+		super(tamMax);
+	}
+	
+	public Item RetornarItemPorId(UUID id) throws ArrayVaziaException, ElementoInexistenteException {
+		if (elementos.size() == 0) { 
+			throw new ArrayVaziaException("Array está vazia");	
+		}
+		
+		for(Item item : elementos){
+			if(item.getId().equals(id)) {
+				return item;
+			}
+		}
+		throw new ElementoInexistenteException("Elemento inexistente");
+	}
+}

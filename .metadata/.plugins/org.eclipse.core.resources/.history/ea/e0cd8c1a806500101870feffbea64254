@@ -1,0 +1,45 @@
+package itens;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import erros.EmprestimoException;
+
+public class PecaSuperior extends Item implements IEmprestavel {
+	private LocalDate dataDeEmprestimo;
+	private int tamanho;
+	private boolean externo;
+	
+	// getters
+	public String getTipo() { return "superior"; }
+	public int getTamanho() { return tamanho; }
+	public boolean isExterno() { return externo; }
+	
+	// setters
+	public void setTamanho(int tamanho) { this.tamanho = tamanho; }
+	public void setExterno(boolean externo) { this.externo = externo; }
+
+
+	
+	public PecaSuperior(String modelo, String lojaOrigem, estadosConservacao conservacao, double preco, int tamanho, boolean externo) {
+		super(modelo, lojaOrigem, conservacao, preco);
+		this.tamanho = tamanho;
+		this.externo = externo;
+		dataDeEmprestimo = null;
+	}
+	
+	public long quantidadeDeDiasDesdeOEmprestimo() throws EmprestimoException{
+		if (dataDeEmprestimo.equals(null)) {
+			throw new EmprestimoException("não está em emprestimo");
+		}
+		return ChronoUnit.DAYS.between(LocalDate.now(), dataDeEmprestimo);
+		
+	}
+	
+	public void registrarDevolucao() throws EmprestimoException {
+		if (dataDeEmprestimo.equals(null)) {
+			throw new EmprestimoException("não está em emprestimo");
+		}
+		dataDeEmprestimo = null;
+	}
+}

@@ -1,0 +1,9 @@
+package recursosGrafico;
+
+import interfaceGrafica.GerenciadorPaginas;
+
+public abstract class ModeloJanelaListar extends ModeloPagina {
+	public ModeloJanelaListar(GerenciadorPaginas gerenciador) {
+		super(gerenciador);
+	}
+}
